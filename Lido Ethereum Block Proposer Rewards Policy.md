@@ -1,7 +1,7 @@
 # Lido on Ethereum Block Proposer Rewards Policy
 
 ```markdown!
-STATUS: DRAFT Open for comment
+STATUS: v1.0 (Post-Merge soft-rollout)
 ```
 
 ## A. Overview
@@ -38,7 +38,7 @@ To that end, Lido as a protocol should:
 ##### Priority fee receipt and distribution
 [Priority fees](#Priority-fees) are sent to the `fee recipient` configured for a validator. In general  Node Operators should ensure that priority fees should be sent to the `Lido Execution Layer Rewards Vault`.
 
-In the case that the `fee recipient` is otherwise overidden (e.g. due the execution of a block with extracted MEV where the `fee recipient` points to a [block builder's](#Block-Builder) address instead), a transaction within the payload should exist from the block builder to the Lido Execution Layer Rewards Vault with at least the sum-total of priority fees for that block (for transactions sourced from the public mempool), plus any additional rewards from MEV extraction.
+In the case that the `fee recipient` is otherwise overridden (e.g. due the execution of a block with extracted MEV where the `fee recipient` points to a [block builder's](#Block-Builder) address instead), a transaction within the payload should exist from the block builder to the Lido Execution Layer Rewards Vault with at least the sum-total of priority fees for that block (for transactions sourced from the public mempool), plus any additional rewards from MEV extraction.
 
 #### D.2.II MEV and MEV rewards
 
@@ -123,7 +123,7 @@ __MEV Monitoring & Penalty parameters__
 |`ALLOWED_FREQ_DEV`|TBD|In percentage terms, how often a Node Operator may deviate from the `reference block` within window `DEV_WINDOW` before being considered in breach of policy||
 |`DEV_WINDOW`|TBD|In proposed blocks, the length of the rolling window|
 
-### D.5 Currently prescribed solution(s)
+#### D.5 Currently prescribed solution(s)
 
 This section will be reviewed by the DAO and updated on an at-least yearly basis and more often if needed. It details which block production solutions may be used by Node Operators at the current time.
 
@@ -131,17 +131,23 @@ This section will be reviewed by the DAO and updated on an at-least yearly basis
 Applicability period: Merge date - 2022/10/31
 (Unless otherwise overriden by a more recent DAO vote)
 
-Summary: Post-merge soft-rollout of MEV-Boost
+Summary: Post-Merge soft-rollout of MEV-Boost
 ```
 
 Lido should aid Ethereum in moving towards its stated goal, PBS.
 
-From any time following the Merge ([slated to occur between 10-20th of September](https://blog.ethereum.org/2022/08/26/finalized-no-37)), Node Operators have roughly six weeks (until the end of October 2022) to test and implement MEV-Boost using blocks sourced from DAO-vetted relays [as per LIP-17](https://research.lido.fi/t/lip-17-mev-boost-relays-whitelist-for-lido/2885). To that end:
+From any time following the Merge ([slated to occur between 10-20th of September](https://blog.ethereum.org/2022/08/26/finalized-no-37)), Node Operators have roughly six weeks (until the end of October 2022) to test and implement MEV-Boost such that blocks produced are sourced from DAO-vetted relays (see [LIP-17](https://research.lido.fi/t/lip-17-mev-boost-relays-whitelist-for-lido/2885) for details about where the vetted relay information will be stored and how they may be retrieved by Node Operators). This period constitutes a soft-rollout so that Node Operators may properly test and configure their infrastructure prior to the policy being fully in effect.
 
+The below summarizes the prescribed solution to work towards within the soft-rollout period:
 1. Validators operated by Node Operators participating in the Lido protocol should produce blocks via the MEV-Boost infrastructure as detailed in [Appendix A.1](#Appendix-A.1-MEV-Boost), by obtaining sealed blocks from the maximum possible number of relays (to be determined by each Node Operator based on their own risk and legal assessment) from Lido's "must-include list" and an optional number of relays from the "allow list".
 2. If using MEV-boost infrastructure leads to any operational failures/difficulties (e.g. failing to produce valid blocks, blocks at all, received rewards being incorrect, or lack of availability of appropriate relays), the Node Operator may fall back to building blocks via the "Default" block-building method.
 3. Blocks produced by the validators will be monitored as per [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section and the monitoring section of the relevant Appendices. 
 4. Node Operators acting in violation of the policy are subject to penalties as described in the [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section.
+
+Prior to the end of the soft-rollout period, the DAO will review and update (via a vote) this policy, in order to:
+* re-confirm or amend the prescribed solution if deemed necessary and set the new applicability period for the policy;
+* stipulate the values for the MEV Monitoring & Penalty parameters; and
+* indicate the finalized Monitoring Mechanisms.
 
 ## E. Definitions
 
@@ -175,8 +181,8 @@ A user/organization/etc. which holds (w)stETH.
 
 |Version|Date|Description|
 |-|-|-|
-|0.1|Aug 10, 2022|Initial policy creation|
-||||
+|0.1|Aug 10, 2022|Initial policy creation (DRAFT)|
+|1.0|Sep 7, 2022|First version of policy with soft-rollout proposed to DAO|
 
 
 # Appendix A - Detailed MEV Lido Implementations
@@ -191,7 +197,7 @@ Notes:
 (2) It’s possible that a Node Operator may vertically integrate several of the above roles, but in the case of Lido Node Operators are asked to not run their own relays (as this might allow for MEV hiding or cheating).	
 
 ### A.1.I Configuration
-`<Insert any specifics RE: MEV boost configuration here>`
+Node Operators should ensure that validators that they are running for Lido are properly registered with the relevant relays as explained in [A.1.II Relays](#A.1.II-Relays) and [D.5 Currently Prescribed Solutions](#D5-Currently-prescribed-solutions)
 
 ### A.1.II Relays
 In MEV-Boost relays can be configured at a per-validator level. The expectation is that Lido Node Operators would ensure that for all validators that are being run as a part of the Lido on Ethereum protocol, the appropriate list of relays is regularly updated and correctly configured.
@@ -203,7 +209,7 @@ As an immediate practical solution, Relays will basically need to be trusted to 
 As a result, if using MEV-boost, Lido should adopt the following requirements with regards to use of relays by Lido Node Operators:
 1. The Lido DAO, either directly or via an appointed committee/sub-group, will maintain two lists of MEV-Boost relays:
     1. A "must-include list" of relays - DAO-vetted relays that are considered trustworthy, well-operated, and reliable.
-    2. An "allow list" of relays - DAO-approved but perhaps less well-known or battle-tested relays which can be trialed prior to inclusion in the "must-include list".
+    2. An "allow list" of relays - DAO-approved but perhaps less well-known or battle-tested relays which can be trialled prior to inclusion in the "must-include list".
 2. For validators which they run as a part of the Lido protocol, Node Operators should configure their MEV-Boost instances to connect to as many of the relays included in the "must include list" as possible, based on each Node Operator's risk and legal assessment. Additionally and optionally, they may include any of the relays included in the "allow list". Node Operators should not source blocks from relays not included in either list.
 3. Both the "must include list" and the "allow list" should be maintained in such a way that they are:
     1. Relatively easily amendable (in case relays should be considered for addition, e.g. via public request, or relays should be removed e.g. for bad performance), and

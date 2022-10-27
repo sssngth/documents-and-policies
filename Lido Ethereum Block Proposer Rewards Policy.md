@@ -1,7 +1,7 @@
 # Lido on Ethereum Block Proposer Rewards Policy
 
 ```markdown!
-STATUS: v1.0 (Post-Merge soft-rollout)
+STATUS: v2.0 (22/Q4 - 23/Q1 MEV-Boost Full-scale Adoption - Phase 1)
 ```
 
 ## A. Overview
@@ -11,7 +11,7 @@ As a DAO and a protocol, Lido on Ethereum should have a transparent, enforceable
 This policy aims to outline how Node Operators participating in Lido should distribute rewards obtained due to block production (including potential MEV rewards), what mechanisms or infrastructure may be used in execution of this, how rewards will be distributed, and how these activities will be monitored.
 
 ## C. Scope
-This policy applies to the Lido on Ethereum protocol, the [Node Operators](#Node-Operator) that participate in the protocol, and the validators that they operate as a part of the protocol.
+This policy applies to the Lido on Ethereum protocol, the [Node Operators](#Node-Operator) that participate in the protocol, the validators that they operate as a part of the protocol, and additional parties who play substantial roles in process of block proposal as a result of provision of a service that is utilized by Node Operators in the execution of block proposals, such as relays and relay operators.
 
 ## D. Policy Statement
 
@@ -78,7 +78,7 @@ As at the time of the most recent policy update, contributors to Lido have ident
 
 |Infrastructure|Description|Implementation Details|
 |-|-|-|
-|[MEV-Boost](https://boost.flashbots.net/)|MEV-boost is an out-of-protocol implementation of [PBS](#PBS) by [Flashbots](https://flashbots.net/). It works by separating concerns across at least three roles: <br /> * Block Builders (responsible for assembling block content and sending them along with bids to relays) <br /> * Relays (responsible for aggregating, sorting, and simulating bids from builders, sending them to Block Proposers (first encrypted, then revealed once they have been accepted right before the block is published)<br /> * Block Proposers (responsible for interfacing with relays and selecting block proposals based on the bids that have been received).<br /><br /> Notes:<br />(1) There may be more actors (especially upstream of Block Builders) but they're not especially important for this policy.<br />(2) It's possible that a Node Operator may vertically integrate several of the above roles, but in the case of Lido Node Operators are asked to not run their own relays (as this might allow for MEV hiding or cheating).|See [Appendix A.1](#Appendix-A.1-MEV-Boost)|
+|[MEV-Boost](https://boost.flashbots.net/)|MEV-boost is an out-of-protocol implementation of [PBS](#PBS) by [Flashbots](https://flashbots.net/). It works by separating concerns across at least three roles: <br /> * Block Builders (responsible for assembling block content and sending them along with bids to relays) <br /> * Relays, operated by Relay Operators, (responsible for aggregating, sorting, and simulating bids from builders, sending them to Block Proposers (first encrypted, then revealed once they have been accepted right before the block is published)<br /> * Block Proposers (responsible for interfacing with relays and selecting block proposals based on the bids that have been received).<br /><br /> Notes:<br />(1) There may be more actors (especially upstream of Block Builders) but they're not especially important for this policy.<br />(2) It's possible that a Node Operator may vertically integrate several of the above roles, but in the case of Lido Node Operators are asked to not run their own relays (as this might allow for MEV hiding or cheating).|See [Appendix A.1](#Appendix-A.1-MEV-Boost)|
 |Default block-building|Normal block building via the public mempool using standard / un-modified Execution Layer client software.|N/A|
 
 ### D.4 Monitoring & Penalties
@@ -128,26 +128,25 @@ __MEV Monitoring & Penalty parameters__
 This section will be reviewed by the DAO and updated on an at-least yearly basis and more often if needed. It details which block production solutions may be used by Node Operators at the current time.
 
 ```markdown!
-Applicability period: Merge date - 2022/10/31
-(Unless otherwise overriden by a more recent DAO vote)
+Applicability period: 2022/11/1 - 2023/3/30
+(Unless otherwise overriden by a superceding DAO vote)
 
-Summary: Post-Merge soft-rollout of MEV-Boost
+Summary: 22/Q4 - 23/Q1 MEV-Boost Full-scale Adoption - Phase 1
 ```
 
 Lido should aid Ethereum in moving towards its stated goal, PBS.
 
-From any time following the Merge ([slated to occur between 10-20th of September](https://blog.ethereum.org/2022/08/26/finalized-no-37)), Node Operators have roughly six weeks (until the end of October 2022) to test and implement MEV-Boost such that blocks produced are sourced from DAO-vetted relays (see [LIP-17](https://research.lido.fi/t/lip-17-mev-boost-relays-whitelist-for-lido/2885) for details about where the vetted relay information will be stored and how they may be retrieved by Node Operators). This period constitutes a soft-rollout so that Node Operators may properly test and configure their infrastructure prior to the policy being fully in effect.
+Following the Merge, Node Operators were requested to roll out and use MEV-Boost for validators that they operate as a part of the Lido procotocol via a soft-rollout approach. They were asked to use as many of the relays which had signaled interest for inclusion as possible in order to test the efficacy and performance of the relays. Following the soft-rollout period and going forward, Node Operators are expected to adhere to the following:
+1. The DAO will hold a vote to determine which relays will be added to the "must-include list" and "allow list" of MEV-Boost relays.
+2. Validators operated by Node Operators participating in the Lido protocol should be configured to produce blocks via the MEV-Boost infrastructure (or equivalent, such as Vouch's MEV-Service) as detailed in [Appendix A.1](#Appendix-A1-MEV-Boost), by obtaining sealed blocks from the maximum possible number of relays from Lido's "must-include list" (those used will be determined by each Node Operator based on their own risk and legal assessment) and an optional number of relays from the "allow list".
+3. If using MEV-boost infrastructure leads to any operational failures/difficulties (such as, but not limited to: failing to produce valid blocks, failing to produce blocks at all, received rewards being incorrect, or lack of availability of appropriate relays), the Node Operator should refer to and act as per the guidelines in [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production-amp-Relay-Troubleshooting).
+5. Blocks produced by the validators will be monitored as per [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section and the monitoring section of the relevant Appendices. If as at the time of the start of the applicability period the "MEV Monitoring & Penalty parameters" have not yet been defined, a grace period will be instituted until such a time that the parameters are defined and ratified by the DAO, at which point this policy will be updated.
+6. Node Operators acting in violation of the policy are subject to penalties as described in the [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section.
 
-The below summarizes the prescribed solution to work towards within the soft-rollout period:
-1. Validators operated by Node Operators participating in the Lido protocol should produce blocks via the MEV-Boost infrastructure as detailed in [Appendix A.1](#Appendix-A.1-MEV-Boost), by obtaining sealed blocks from the maximum possible number of relays (to be determined by each Node Operator based on their own risk and legal assessment) from Lido's "must-include list" and an optional number of relays from the "allow list".
-2. If using MEV-boost infrastructure leads to any operational failures/difficulties (e.g. failing to produce valid blocks, blocks at all, received rewards being incorrect, or lack of availability of appropriate relays), the Node Operator may fall back to building blocks via the "Default" block-building method.
-3. Blocks produced by the validators will be monitored as per [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section and the monitoring section of the relevant Appendices. 
-4. Node Operators acting in violation of the policy are subject to penalties as described in the [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section.
-
-Prior to the end of the soft-rollout period, the DAO will review and update (via a vote) this policy, in order to:
+Prior to the end of the Phase 1 of the Full-Scale Adoption period, the DAO will review and update (via a vote) this policy, in order to:
 * re-confirm or amend the prescribed solution if deemed necessary and set the new applicability period for the policy;
-* stipulate the values for the MEV Monitoring & Penalty parameters; and
-* indicate the finalized Monitoring Mechanisms.
+* stipulate or amend the values for the MEV Monitoring & Penalty parameters; and
+* indicate any updates or refinements to be put in place regarding Monitoring Mechanisms.
 
 ## E. Definitions
 
@@ -183,18 +182,20 @@ A user/organization/etc. which holds (w)stETH.
 |-|-|-|
 |0.1|Aug 10, 2022|Initial policy creation (DRAFT)|
 |1.0|Sep 7, 2022|First version of policy with soft-rollout proposed to DAO|
+|2.0|Oct 24, 2022|Second version of policy with full-scale rollout|
 
 
 # Appendix A - Detailed MEV Lido Implementations
 ## Appendix A.1 MEV-Boost
 MEV-boost is an out-of-protocol implementation of PBS by Flashbots. It works by separating concerns across at least three roles:
 * Block Builders (responsible for assembling block content and sending them along with bids to relays)
-* Relays (responsible for aggregating, sorting, and simulating bids from builders, sending them to Block Proposers (first encrypted, then revealed once they have been accepted right before the block is published)
+* Relays, operated by Relay Operators, (responsible for aggregating, sorting, and simulating bids from builders, sending them to Block Proposers (first encrypted, then revealed once they have been accepted right before the block is published)
 * Block Proposers (responsible for interfacing with relays and selecting block proposals based on the bids that have been received).
 
 Notes:
 (1) There may be more actors (especially upstream of Block Builders) but they’re not especially important for this policy.
-(2) It’s possible that a Node Operator may vertically integrate several of the above roles, but in the case of Lido Node Operators are asked to not run their own relays (as this might allow for MEV hiding or cheating).	
+(2) It’s possible that a Node Operator may vertically integrate several of the above roles, but in the case of Lido Node Operators are asked to not run their own relays (as this might allow for MEV hiding or cheating).
+(3) It's possible that a Relay Operator operates multiple relays.
 
 ### A.1.I Configuration
 Node Operators should ensure that validators that they are running for Lido are properly registered with the relevant relays as explained in [A.1.II Relays](#A.1.II-Relays) and [D.5 Currently Prescribed Solutions](#D5-Currently-prescribed-solutions)
@@ -218,9 +219,34 @@ As a result, if using MEV-boost, Lido should adopt the following requirements wi
 As a starting point, it is highly suggested that relays considered for inclusion in these lists must be:
 1. publicly available,
 2. publicly listed & maintained,
-3. open source,
-4. transparent about what (if any) transaction or address filtering they enforce.
+4. open source,
+5. transparent about what (if any) transaction or address filtering they enforce,
+6. simulate blocks (or bundles) contained in bids submitted by builders for validity and correctness, including rewards and fee values.
 
 ### A.1.III Monitoring
 
 Spec is being refined as MEV-Boost specs and Relay API are being finalized, meanwhile please refer to https://hackmd.io/@george-avs/SyGqpItIc for the general gist.
+
+### A.1.IV Block Production & Relay Troubleshooting
+
+In the case that operational issues are noticed (e.g. blocks not produced as expected, blocks not being timely unblinded, blocks not being timely created and propagated, blocks being invalid are invalid, relays not providing agreed upon data or monitoring APIs, etc.) the Node Operator should temporarily disable the relevant relay(s) until such a time that:
+* (a) service is sufficiently and satisfactorily restored, or 
+* (b) the DAO and Node Operators collectively decide that the relay(s) should no longer be used and removed from the relevant vetted lists, at which point a DAO vote should be made to do so.
+
+In these cases, the Node Operator should also:
+* timely inform the rest of the Lido Node Operator community about the issues identified,
+* reach out to the Lido Node Operator Management contributors to notify them of the issues, and
+* reach out to the relay operator to understand the source of the issue and report back
+
+If a Node Operator is found to be "under-performing" as per the mechanism described in [D.4 Monitoring & Penalties](#D4-Monitoring-amp-Penalties) but this is due to issues stemming from a bad relay or malicious builders interfering with block production, then the Operator will not considered out of compliance with the policy. 
+
+### A.1.V Relay & Relay Operator Responsibilities and Incident Management
+Given the trusted nature of relays in the MEV-Boost context, it behooves Relay Operators to ensure that they and the relays that they operate function effectively, performantly, and efficiently, and that any and all communications are made timely and professionally. 
+
+Relay Operators should notify relevant Lido protocol participants (e.g. Node Operators, the Node Operator Management Workstream) as soon as possible upon identification of an issue with any of the relays that they operate. Notification may be performed through public ([Lido forum](https://research.lido.fi/), Lido discord, etc.) and/or private channels (e.g. group chats) available to them, so that Node Operators can proceed with appropriate changes to their MEV-Boost configurations.
+
+During an incident, Relay Operators should provide regular updates with regards to the status of the incident. Following the conclusion of the incident, Relay Operators should provide an incident report (or post-mortem) that details at minimum the root cause, fixes performed, if/how soon the relay will be back in service, and what steps have been undertaken to prevent the likelihood of similar incidents in the future. Additionally, in cases where block production was adversely affected (see [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production-amp-Relay-Troubleshooting)), Relay Operators should advise as to what steps will be taken (if any) to reimburse validators for any missed/lost/invalid/etc. blocks and/or incorrect/invalid/inaccurate bids.
+
+Incidents will be reviewed on an ad-hoc basis by the Node Operator and Lido DAO communities. These reviews will inform DAO decisions (via vote) regarding whether Relay Operators and the relays that they operate will continue to be considered vetted and ratified for use by Node Operators or not.
+
+Relays which exhibit poor or otherwise unacceptable communication and especially performance (such as, but not limited to, inability to performantly and timely register validators, inability to performantly and timely send/receive bids and payloads, not verify bids, not simulate payload validity etc.), and/or fail to conform with the expectations outlined above with regards to incident management (as determined by the DAO and Node Operator communities) will be subject to removal from the Lido-approved relay lists.

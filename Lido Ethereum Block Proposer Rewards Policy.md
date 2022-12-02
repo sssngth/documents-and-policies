@@ -11,7 +11,7 @@ As a DAO and a protocol, Lido on Ethereum should have a transparent, enforceable
 This policy aims to outline how Node Operators participating in Lido should distribute rewards obtained due to block production (including potential MEV rewards), what mechanisms or infrastructure may be used in execution of this, how rewards will be distributed, and how these activities will be monitored.
 
 ## C. Scope
-This policy applies to the Lido on Ethereum protocol, the [Node Operators](#Node-Operator) that participate in the protocol, the validators that they operate as a part of the protocol, and additional parties who play substantial roles in process of block proposal as a result of provision of a service that is utilized by Node Operators in the execution of block proposals, such as relays and relay operators.
+This policy applies to the Lido on Ethereum protocol, the [Node Operators](#Node-Operator) that participate in the protocol, the validators that they operate as a part of the protocol, and additional parties who play substantial roles in the process of block proposal as a result of provision of a service that is utilized by Node Operators in the execution of block proposals, such as relays and relay operators.
 
 ## D. Policy Statement
 
@@ -108,13 +108,14 @@ Lido should monitor, record, and assess non-compliance with this policy. Monitor
 * Assessing whether the correct `fee recipient` has been configured by the [Node Operators](#Node-Operator) for the validators that they operate
 * Assessing from which source proposed blocks by the validators have been received (and if that source is appropriate)
 * Assessing the general availability of the allowed sources for block bids around the time of each block being proposed
+* Assessing, in cases where blocks were not constructed via chosen MEV infrastructure, if this was due to a `min-bid`-like setting and whether the value of the `min-bid` used in these cases conforms to the expectations set by the Policy
 * Assessing, in cases where blocks were not constructed via chosen MEV infrastructure, whether the block proposed contained transactions not available in the public mempool
 * Recording, on a per-block basis, the most valuable known block bids offered via accepted MEV infrastructure (and block bid sources, e.g. relays), i.e. the `reference block`
 * Recording, on a per-block basis, the blocks actually produced by the validators and their total value, i.e. the `actual block`
-* Analyzing, on a per-block basis and historically, the difference between the `reference block` and the `actual block` for each Node Operator participating in Lido
+* Analyzing, on a per-block basis and historically, the difference between the `reference block` and the `actual block` for each Node Operator participating in Lido, having also properly taken into account the effect that `min-bid` usage would have on such a difference
 
 
-Some leeway should be given to Node Operators for potential network problems, faulty relays, or buggy software outside their control. It should be enough for the Lido DAO to punish gross misbehavior when a Node Operator is deviating more than `ALLOWED_VALUE_DEV`% from the reference block, on a frequency basis more than `ALLOWED_FREQ_DEV`% of the time over a rolling time window `DEV_WINDOW`. These parameters can be reviewed and tweaked via governance, if needed.
+Some leeway should be given to Node Operators for potential network problems, faulty relays, `min-bid` usage, or buggy software outside their control. It should be enough for the Lido DAO to punish gross misbehavior when a Node Operator is deviating more than `ALLOWED_VALUE_DEV`% from the reference block, on a frequency basis more than `ALLOWED_FREQ_DEV`% of the time over a rolling time window `DEV_WINDOW`. These parameters can be reviewed and tweaked via governance, if needed.
 
 __MEV Monitoring & Penalty parameters__
 |Variable|Value|Description|History|
@@ -128,23 +129,27 @@ __MEV Monitoring & Penalty parameters__
 This section will be reviewed by the DAO and updated on an at-least yearly basis and more often if needed. It details which block production solutions may be used by Node Operators at the current time.
 
 ```markdown!
-Applicability period: 2022/11/1 - 2023/3/30
+Applicability period: 2022/11/1 - 2023/6/30
 (Unless otherwise overriden by a superceding DAO vote)
 
-Summary: 22/Q4 - 23/Q1 MEV-Boost Full-scale Adoption - Phase 1
+Summary: 2022/Q4 - 2023/Q2 MEV-Boost Full-scale Adoption - Phase 1
 ```
 
 Lido should aid Ethereum in moving towards its stated goal, PBS.
 
 Following the Merge, Node Operators were requested to roll out and use MEV-Boost for validators that they operate as a part of the Lido protocol via a soft-rollout approach. They were asked to use as many of the relays which had signaled interest for inclusion as possible in order to test the efficacy and performance of the relays. Following the soft-rollout period and going forward, Node Operators are expected to adhere to the following:
-1. The DAO will hold a vote to determine which relays will be added to the "must-include list" and "allow list" of MEV-Boost relays.
-2. Validators operated by Node Operators participating in the Lido protocol should be configured to produce blocks via the MEV-Boost infrastructure (or equivalent, such as Vouch's MEV-Service) as detailed in [Appendix A.1](#Appendix-A1-MEV-Boost), by obtaining sealed blocks from the maximum possible number of relays from Lido's "must-include list" (those used will be determined by each Node Operator based on their own risk and legal assessment) and an optional number of relays from the "allow list".
-3. If using MEV-boost infrastructure leads to any operational failures/difficulties (such as, but not limited to: failing to produce valid blocks, failing to produce blocks at all, received rewards being incorrect, or lack of availability of appropriate relays), the Node Operator should refer to and act as per the guidelines in [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production-amp-Relay-Troubleshooting).
+1. The DAO will hold a Snapshot vote to: 
+    * determine which MEV-Boost relays will be added to the initial "must-include list" and "allow list" ("relay lists")
+    * for ease of governance operations given the number of new relays being created and the need for haste in certain scenarios, identify and approve a set of multi-sig participants who will manage the relay lists (the "Relay Maintenance Committee (RMC)") for the duration of Phase 1, or until the management of the relay lists can be moved to [Lido Easy Track](https://docs.lido.fi/guides/easy-track-guide)
+    * delegate authority to the RMC to make decisions about which relays are added to or moved between the "relay lists", provided that RMC decisions are posted publicly on the Lido research forums prior to any on-chain actions being taken and giving the DAO and community a reasonable amount of time to consider. The DAO retains the right to a final decision and community members may post a Snapshot vote to change or counteract RMC decisions and/or reconstitute the RMC with different participants.
+2. Validators operated by Node Operators participating in the Lido protocol should be configured to produce blocks via the MEV-Boost infrastructure (or equivalent, such as Vouch's MEV-Service) as detailed in [Appendix A.1](#Appendix-A1-MEV-Boost), by obtaining sealed blocks from the maximum possible number of relays from Lido's "must-include list" (those used will be determined by each Node Operator based on their own risk and legal assessment) and an optional number of relays from the "allow list". *NOTE: the use of "must" here is effectively "must use some", not "must use all". The purpose is to promote relay diversity (and thus builder diversity). Node Operators may elect to not use all the relays from the "must-include list", but the entirety of that list is used as a basis for the formation of the reference block as described in [Monitoring & Penalties](#D4-Monitoring-amp-Penalties).*
+3. In Phase 1, Node Operators may also opt-in to configure a `min-bid` value in MEV-Boost ranging from `0` (default) to a preliminary upper maximum to be determined based on community alignment and agreement and published on the Lido Research Forums ([min-bid discussion thread](https://research.lido.fi/t/lido-node-operator-mev-boost-min-bid-guidance/3347)). The effects of usage of `min-bid` should be incorporated into the allowable deviation parameters discussed in [Monitoring & Penalties](#D4-Monitoring-amp-Penalties), such that only egregious and/or non-community aligned (including but not limited to values and usage that would be substantially detrimental to protocol APR) values of `min-bid` would result in a Node Operator being penalized. The effects of `min-bid` implementation will be analyzed and shared with the DAO during Phase 1 to determine and codify a more specific policy. 
+4. If using MEV-boost infrastructure leads to any operational failures/difficulties (such as, but not limited to: failing to produce valid blocks, failing to produce blocks at all, received rewards being incorrect, or lack of availability of appropriate relays), the Node Operator should refer to and act as per the guidelines in [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production-amp-Relay-Troubleshooting).
 5. Blocks produced by the validators will be monitored as per [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section and the monitoring section of the relevant Appendices. If as at the time of the start of the applicability period the "MEV Monitoring & Penalty parameters" have not yet been defined, a grace period will be instituted until such a time that the parameters are defined and ratified by the DAO, at which point this policy will be updated.
-6. Node Operators acting in violation of the policy are subject to penalties as described in the [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section.
+7. Node Operators acting in violation of the policy are subject to penalties as described in the [Monitoring & Penalties](#D4-Monitoring-amp-Penalties) section.
 
-Prior to the end of the Phase 1 of the Full-Scale Adoption period, the DAO will review and update (via a vote) this policy, in order to:
-* re-confirm or amend the prescribed solution if deemed necessary and set the new applicability period for the policy;
+Prior to the end of the Phase 1 of the Full-Scale Adoption period, or as soon as possible thereafter, the DAO will review and update (via a vote) this policy, in order to:
+* re-confirm or amend the prescribed solution if deemed necessary and set the new applicability period for the next phase policy;
 * stipulate or amend the values for the MEV Monitoring & Penalty parameters; and
 * indicate any updates or refinements to be put in place regarding Monitoring Mechanisms.
 

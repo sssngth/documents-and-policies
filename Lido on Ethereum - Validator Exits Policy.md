@@ -5,19 +5,19 @@ tags: policy, validator exits, lido dao, node operators
 
 # Lido on Ethereum Validator Exits Policy
 ```markdown!
-STATUS: V1.0
+STATUS: V2.0 (24/Q1 - Introduction of Triggerable Exits - Extension to Lido V2)
 ```
 
 
 ## A. Background
-### Ethereum validator exit mechanisms
-Currently, there are two ways an Ethereum validator can exit. The first is a voluntary exit, a validator may choose to voluntarily stop performing duties (proposing blocks and attesting to blocks) by submitting a voluntary exit transaction to the beacon chain. The second is forced ejection from the protocol – this could be triggered by slashing or insufficient effective balance (the current threshold is 16 ETH). Additionally, there are ongoing discussions in the Ethereum community around  introducing a third method for exiting validators, namely withdrawal credential based triggers of a validator.
+### Ethereum Validator Exit Mechanisms
+Currently, there are two ways an Ethereum validator can exit. The first is a voluntary exit, a validator may choose to voluntarily stop performing duties (proposing blocks and attesting to blocks) by submitting a voluntary exit transaction to the Beacon Chain. The second is forced ejection from the protocol – this could be triggered by slashing or insufficient effective balance (the current threshold is 16 ETH). Additionally, there are ongoing discussions in the Ethereum community around introducing a third method for exiting validators, namely withdrawal credential based triggers of a validator.
 
 #### Voluntary Exit
-A validator can initiate a voluntary exit provided that it is currently active, has not been slashed, and has been active for at least 256 epochs (~27 hours). It does so by signing a “voluntary exit message” (VEM) using the validator key, and broadcasting it to the Consensus Layer (CL) client – or directly (e.g. via an API) – to be processed. Once the validator’s exit message is processed, the validator joins the exit queue. After initiating a voluntary exit, the validator is expected to keep performing duties until it has successfully exited to avoid incurring any penalties. Once the validator has reached the exit epoch, it ceases to perform duties and stops receiving rewards and penalties (enters the “withdrawable” state). Once in the withdrawable state, the validator waits until its index is parsed by the withdrawals sweep operation in order for the balance of the validator to be withdrawn to its specified Execution Layer (EL) 0x01 withdrawal credentials (note that validators with 0x00 withdrawal credentials will need to rotate to 0x01 in order for the withdrawal to be processed, otherwise they are skipped).
+A validator can initiate a voluntary exit provided that it is currently active, has not been slashed, and has been active for at least 256 epochs (~27 hours). It does so by signing a “voluntary exit message” (VEM) using the validator key, and broadcasting it to the Consensus Layer (CL) client – or directly (e.g. via an API) – to be processed. Once the validator’s exit message is processed, the validator joins the exit queue. After initiating a voluntary exit, the validator is expected to keep performing duties until it has successfully exited to avoid incurring any penalties. Once the validator has reached the exit epoch, it ceases to perform duties and stops receiving rewards and penalties (enters the “withdrawable” state). Once in the withdrawable state, the validator waits until its index is parsed by the withdrawals sweep operation for the balance of the validator to be withdrawn to its specified Execution Layer (EL) 0x01 withdrawal credentials (note that validators with 0x00 withdrawal credentials will need to rotate to 0x01 for the withdrawal to be processed, otherwise they are skipped).
 
 #### Forced Exit 
-Forced exits are not relevant for the purposes of this policy document, but occur either as a result of a validator being slashed or as a result of their effective balance falling below the `EJECTION_BALANCE` threshold (currently 16 ETH).
+Forced exits are not relevant for the purposes of this policy, but occur either as a result of a validator being slashed or as a result of their effective balance falling below the `EJECTION_BALANCE` threshold (currently 16 ETH).
 
 #### Triggerable Exit 
 Proposals have been made to introduce functionality into Ethereum that would allow withdrawal credentials (from the EL) to signal and initiate an exit for related validators.  Such functionality would provide increased assurances with respect to the timely and orderly exit of validators for staking solutions, as well as potential counter-measures against malicious or ill-performing Node Operators. The downside to this, however, is that triggerable exits incur on-chain gas costs for transactions which do not exist on the CL side – this makes them less suitable than the CL-initiated variant for the average validator exit use case (nor are they a cure-all since validators may still misbehave while in the exit queue). Once/if triggerable exits become available on Ethereum, this policy will need to be updated to detail how, and in which cases, they can be utilized by the protocol.
@@ -26,36 +26,39 @@ Proposals have been made to introduce functionality into Ethereum that would all
 ### B.1 Goals
 
 Validator exits may be utilized by fully-functioning staking protocols, including Lido, for the following reasons:
-* In order to satisfy withdrawal redemption requests from users (e.g. if a withdrawal request is larger than the amount of stake that can be made available for redemption via only partial withdrawals / skimming).
+* To satisfy withdrawal redemption requests from users (e.g. if a withdrawal request is larger than the amount of stake that can be made available for redemption via only partial withdrawals/skimming).
 * To reallocate stake across the operator set (move stake from one operator to another) for a variety of reasons (e.g. substandard performance, guiding principles from the Operator Set Strategy).
 * To rotate signing keys for some validators without changing the stake allocation.
 
-The proposed V2 upgrade of Lido on Ethereum protocol would put in place a series of mechanisms based on on-chain signalling that will serve to notify Node Operators who participate in the protocol when they need to process validator exits. 
+The V2 upgrade of Lido on Ethereum protocol put in place a series of mechanisms based on on-chain signalling that serve to notify Node Operators who participate in the protocol when they need to process validator exits. 
 
 
 ### B.2 Scope
-This policy applies to the Lido on Ethereum protocol, the Node Operators that participate in the curated Node Operator registry ("Node Operator(s)"), and the validators that they operate as a part of the protocol. Validators outside of the curated registry are currently out of scope of this policy but may be included in later revisions.
+This policy applies to the Lido on Ethereum protocol, the Node Operators that participate in the [Curated](#Curated-Module) and/or [Simple DVT Module](#Simple-DVT-Module) of [Lido V2's](#Lido-V2) [Staking Router](#Staking-Router) and the validators that they operate as a part of the protocol.
 
 ### B.3 Policy Statement
 
 #### B.3.I Validator Exit Order
-The exit sequence of Lido on Ethereum validators (i.e. validators submitted to Lido Node Operator Registries which have been deposited to) should follow a deterministic order so that they can be computed independently and trustlessly if needed. The current proposal for exit order is the "combined approach"  discussed in the relevant topic ["Withdrawals: on Validator Exiting Order"](https://research.lido.fi/t/withdrawals-on-validator-exiting-order/3048/1).
+The exit sequence of Lido on Ethereum validators (i.e. validators submitted to Lido Node Operator Registries which have been deposited to) follows a deterministic order so that exits can be computed independently and trustlessly if needed. The currently implemented order corresponds to the "combined approach" as discussed in [Withdrawals: on Validator Exiting Order](https://research.lido.fi/t/withdrawals-on-validator-exiting-order/3048/), the priority of which is determined by the following [sorting predicate](https://github.com/lidofinance/lido-oracle/blob/develop/src/services/exit_order_iterator.py#L24):
+* Validator whose operator has the lowest number of delayed validators
+* Validator whose operator has the highest number of targeted validators to exit
+* Validator whose operator has the highest stake weight
+* Validator whose operator has the highest number of predictable validators
+* Validator with the lowest index of the operator
 
 #### B.3.II Performance Expectations Over Time
 
 As this is a new policy concerning new functionality of the Ethereum protocol, the proposed enforcement mechanisms, service level expectations, and associated timeframes detailed in this first version of the policy are mild enough to allow for working out initial kinks without an unreasonable penalty. 
 Once the processes and mechanisms around the automation of validators exits have matured, this policy should be revised. In particular, time windows for service level expectations should be tightened and penalties for non-performance should be increased.
 
-
-
 #### B.3.III Node Operator Responsibilities
-Node Operators who participate in the Lido on Ethereum protocol have a duty to correctly exit validators in a timely manner as determined by the protocol’s requirements and rules (as set by the DAO). If they are requested to exit validators ( via signalling using oracles or the exit daemon infrastructure) by the protocol for any of the reasons described in the  section [“B1-Goals” and as per the validator exit order approved by the DAO.](#B1-Goals)
+Node Operators who participate in the Lido on Ethereum protocol have a duty to correctly exit validators in a timely manner as determined by the protocol’s requirements and rules (as set by the DAO). If they are requested to exit validators (via signalling using oracles or the exit daemon infrastructure) by the protocol for any of the reasons described in the  section [“B1-Goals” and as per the validator exit order approved by the DAO.](#B1-Goals)
 
-In order to determine whether Node Operators have appropriately executed the required actions, this policy seeks to outline the time that Node Operators are afforded to do so, and what the penalties for non-conformance should be.
+To determine whether Node Operators have appropriately executed the required actions, this policy seeks to outline the time that Node Operators are afforded to do so, and what the penalties for non-conformance should be.
 
 Generally speaking, Node Operators are expected to exit the indicated validators in a reasonable time frame. The actual mechanisms for validators to be exited are at the discretion of Node Operators, and open source tooling will be available to aid Node Operators in identifying signalled validator exit requests, as well as in processing these requests.
 
-The tooling shall consist of three components, which may be used by Node Operators to operate semi- or fully- automated processing of validator exit requests. Node Operators may instead choose to use any of the below modules with a custom implementation (e.g. to utilize a Just-In-Time approach to the generation of VEMs as opposed to pre-generating a certain % of them).
+The tooling shall consist of three components, which may be used by Node Operators to operate semi- or fully-automated processing of validator exit requests. Node Operators may instead choose to use any of the below modules with a custom implementation (e.g. to utilize a just-in-time (JIT) approach to the generation of VEMs as opposed to pre-generating a certain % of them).
 
 * Keys API (KAPI) Service - a Node Operator-hosted service that loads the operator’s public validator keys, calculates the next keys to be exited, and can be hooked up to other tooling (e.g. eth-do, a custom script for web3 signer, etc) to automate the generation and signing of VEMs to be stored (as pre-signed messages) and made available for use by the Validator Ejector.
 * Validator Ejector - a daemon that listens for Exit Bus Oracle reports, locates pre-signed (or retrieves JIT signed) exit messages for exiting validators and processes the validator exit requests (i.e. submits the VEMs to the CL for broadcast).
@@ -69,8 +72,8 @@ For clarity:
 * A validator exit request is considered "processed" once it has been broadcast to the CL and included in a proposed Beacon Chain slot.
 * A validator exit request is considered "fulfilled" once the validator has been fully exited and withdrawn.
 
-#### B.3.IV Monitoring and Penalties
-Additionally, there will be another piece of tooling dubbed the "Monitor Daemon" which will serve to reconcile signalled validator exit requests with processed exits by the Beacon Chain in order to determine if validators have been exited in a timely manner. The results of this monitoring will be publicly available in order to enable the DAO to access to the data it needs to understand the rate, flow, and efficacy of validator exits.
+#### B.3.IV Monitoring & Penalties
+Additionally, there will be another piece of tooling dubbed the "Monitor Daemon" which will serve to reconcile signalled validator exit requests with processed exits by the Beacon Chain to determine if validators have been exited in a timely manner. The results of this monitoring will be publicly available to enable the DAO to access to the data it needs to understand the rate, flow, and efficacy of validator exits.
 
 Although the process can be largely automated, to account for differences in infrastructure, working hours, and mechanism timings, the below are the required service levels for validator exits that Node Operators must adhere to.
 
@@ -100,12 +103,12 @@ If a Node Operator has a status of Delayed, the NOM workstream will raise an iss
 In the case that a Node Operator cannot, for any reason, exit a validator (e.g. loss of the private key associated with that validator), they are expected to reimburse stakers by supplying the maximum irretrievable balance of the validator (i.e. 32 ETH, since anything over that can be obtained via partial rewards). Doing so renders the validator in question “unrecoverable and reimbursed” and does not count against the Node Operator in terms of assessing its validator exit request status.
 
 
-#### B.3.V Out of Order Exits and NO Business Continuity
+#### B.3.V Out of Order Exits & NO Business Continuity
 
 ##### Out of Order Exits
 
-Out of Order exits refers to exits that are made by a Node Operator when a validator exit request has not been made for a (set of) validator(s) by the Lido protocol. In the case of processing such an exit, the Node Operator must notify the DAO via the Lido forums (https://research.lido.fi) that such an exit has been processed, how many and which validators have been exited, and the reason for the exit.
+Out of Order exits refers to exits that are made by a Node Operator when a validator exit request has not been made for a (set of) validator(s) by the Lido protocol. In the case of processing such an exit, the Node Operator must notify the DAO via the Lido Research Forums (https://research.lido.fi) that such an exit has been processed, how many and which validators have been exited, and the reason for the exit.
 
-##### Business Continuity and Other Considerations
+##### Business Continuity & Other Considerations
 
-If at any time a Node Operator is unable to continue to participate in the Lido on Ethereum protocol (e.g. has become insolvent), it must notify the DAO via the Lido forums (https://research.lido.fi) of the circumstances and signal its intent to exit all of the validators that it operates as a part of the protocol. If the DAO does not otherwise instruct the Node Operator via a ratified vote within 8 days, it must proceed with triggering the exit of all of the validators.
+If at any time a Node Operator is unable to continue to participate in the Lido on Ethereum protocol (e.g. has become insolvent), it must notify the DAO via the Lido Research Forums (https://research.lido.fi) of the circumstances and signal its intent to exit all of the validators that it operates as a part of the protocol. If the DAO does not otherwise instruct the Node Operator via a ratified vote within 8 days, it must proceed with triggering the exit of all of the validators.

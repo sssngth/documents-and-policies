@@ -11,7 +11,7 @@ As a DAO and protocol, Lido on Ethereum should have a transparent, enforceable, 
 This policy aims to outline how NOs participating in Lido should distribute rewards obtained due to block proposals, including potential MEV rewards, what mechanisms or infrastructure may be used in execution of those, how rewards will be distributed, and how these activities will be monitored.
 
 ## C. Scope
-This policy applies to the Lido on Ethereum protocol, the NOs that participate in the permissioned [Curated](#Curated-Module), [Simple Distributed Validator Technology (Simple DVT or SDVT)](#Simple-Distributed-Validator-Technology-Module-Simple-DVT-SDVT), and/or upcoming permissionless [Community Staking Module (CSM)](#Community-Staking-Module-CSM) of [Lido V2's](#Lido-V2) [Staking Router](#Staking-Router), the validators that they operate as a part of the protocol, and additional parties who play substantial roles in the process of block proposal as a result of their provision of services utilized by the NOs in the execution of block proposals, such as relays and relay operators.
+This policy applies to the Lido on Ethereum protocol, the NOs that participate in the permissioned [Curated Module (CM)](#Curated-Module-CM), [Simple Distributed Validator Technology Module (Simple DVT, SDVT or SDVTM)](#Simple-Distributed-Validator-Technology-Module-Simple-DVT-SDVT-Or-SDVTM), and/or upcoming permissionless [Community Staking Module (CSM)](#Community-Staking-Module-CSM) of [Lido V2's](#Lido-V2) [Staking Router](#Staking-Router), the validators that they operate as a part of the protocol, and additional parties who play substantial roles in the process of block proposal as a result of their provision of services utilized by the NOs in the execution of block proposals, such as relays and relay operators.
 
 ## D. Policy Statement
 
@@ -77,7 +77,7 @@ At the time of writing this policy update contributors to Lido have identified t
 
 |Infrastructure|Description|Implementation Details|
 |-|-|-|
-|[MEV-boost](https://boost.flashbots.net/), [Builder API](https://ethereum.org/developers/docs/mev#builder-api), [Vouch](https://www.attestant.io/posts/introducing-vouch/)|MEV-boost is an out-of-protocol implementation of PBS by [Flashbots](https://flashbots.net/), Builder API Ethereum's temporary in-protocol solution "[for validator clients to source blocks built by external entities](https://github.com/ethereum/builder-specs?tab=readme-ov-file#ethereum-builder-api-specification)", and Vouch a multi-node validator client built by [Attestant](https://www.attestant.io/) that "[acts as an MEV-boost server, talking to MEV relays and accepting requests from beacon nodes for execution payload headers.](https://github.com/attestantio/vouch/blob/master/docs/execlayer.md#mev-configuration)"<br /><br /> They work by separating concerns across at least three roles:<br /> * Block builders, responsible for assembling block content and sending them along with bids to relays<br /> * Relays, operated by relay operators, responsible for aggregating, sorting, and simulating bids from block builders, sending them to [block proposers](#Block-Proposer) -- first encrypted, then revealed, once they have been accepted right before the block is published<br /> * Block proposers, responsible for interfacing with relays and selecting block proposals based on the bids that have been received<br /><br /> Notes:<br />(1) There may be more actors, especially upstream of block builders, but they are not especially important for this policy<br />(2) It is possible that a NO may vertically integrate several of the above roles, but in the case of Lido, NOs are asked to not run their own relays as this might allow for MEV hiding or cheating<br />(3) It is possible that a relay operator operates multiple relays|See [Appendix A.1](#appendix-A.1-MEV-Boost)|
+|[MEV-boost](https://boost.flashbots.net/), [Builder API](https://ethereum.org/developers/docs/mev#builder-api), [Vouch](https://www.attestant.io/posts/introducing-vouch/)|MEV-boost is an out-of-protocol implementation of PBS by [Flashbots](https://flashbots.net/), Builder API Ethereum's temporary in-protocol solution "[for validator clients to source blocks built by external entities](https://github.com/ethereum/builder-specs?tab=readme-ov-file#ethereum-builder-api-specification)", and Vouch a multi-node validator client built by [Attestant](https://www.attestant.io/) that "[acts as an MEV-boost server, talking to MEV relays and accepting requests from beacon nodes for execution payload headers.](https://github.com/attestantio/vouch/blob/master/docs/execlayer.md#mev-configuration)"<br /><br /> They work by separating concerns across at least three roles:<br /> * Block builders, responsible for assembling block content and sending them along with bids to relays<br /> * Relays, operated by relay operators, responsible for aggregating, sorting, and simulating bids from block builders, sending them to [block proposers](#Block-Proposer) -- first encrypted, then revealed, once they have been accepted right before the block is published<br /> * Block proposers, responsible for interfacing with relays and selecting block proposals based on the bids that have been received<br /><br /> Notes:<br />(1) There may be more actors, especially upstream of block builders, but they are not especially important for this policy<br />(2) It is possible that a NO may vertically integrate several of the above roles, but in case of Lido, NOs are asked to not run their own relays as this might allow for MEV hiding or cheating<br />(3) It is possible that a relay operator operates multiple relays|See [Appendix A.1](#appendix-A.1-MEV-Boost)|
 |Default block building|Default block building via the public mempool using standard/unmodified EL client software|N/A|
 
 ### D.4 Monitoring & Penalties
@@ -93,7 +93,7 @@ NOs who are found to be engaging in activities against the spirit of this policy
 * Potential refund requests for amounts found to be incorrectly or inappropriately not distributed to the protocol
 * Potential cessation of new stake deposits to their validators
 * Potential stake withdrawal and validators being exited voluntarily or via triggerable exits, when technically possible, and off-boarding from Lido on Ethereum
-* Potential adverse effects on their general standing within the Lido ecosystem -- e.g. having stake delegated to them in other Lido on X networks or Lido Alliance projects reduced, or being off-boarded from them
+* Potential adverse effects on their general standing within the Lido ecosystem -- e.g. having stake delegated to them in other Lido on X networks or Lido Alliance projects reduced, or being off-boarded
 
 #### D.4.I Infrastructure & Availability
 Monitoring with regards to node operator block rewards performance and possible MEV extraction may be made available through two avenues:
@@ -129,12 +129,12 @@ This section will be reviewed and updated by contributors to the DAO on an at-le
 ```markdown!
 Applicability period: Q3/24 - release of in-protocol solution: PBS lite operation (unless overriden by a DAO vote)
 
-Summary: Q4/22 - Q3/24: full-scale MEV-boost adoption & transition to PBS lite
+Summary: Q4/22 - Q3/24: full-scale MEV-boost adoption and transition to PBS lite operation
 ```
 
 Lido should aid Ethereum in moving towards its stated goal, PBS.
 
-Following [The Merge](https://ethereum.org/en/roadmap/merge/), NOs were requested to set up and use MEV-boost for validators that they operate as part of the Lido on Ethereum protocol via a soft-rollout approach. They were asked to use as many of the [relays which had signaled interest for inclusion](https://research.lido.fi/t/lido-on-ethereum-call-for-relay-providers/2844) as possible to test their efficacy and performance.<br /> In parallel to the soft-rollout, the DAO [gained approval](https://snapshot.org/#/lido-snapshot.eth/proposal/0x7ac2431dc0eddcad4a02ba220a19f451ab6b064a0eaef961ed386dc573722a7f) to identify and constitute a set of multi-sig participants with the authority to determine which relays should be added to and moved between the initial "must-include" and "allow list" (relay lists) of the full-scale MEV-boost adoption. The [Relay Maintenance Committee (RMC)](https://research.lido.fi/t/lido-on-ethereum-identify-and-constitute-relay-maintenance-committee/3386) has since served this role under the conditions that (1) it reacts to prospect relays, a decline in performance and/or discontinuation of prescribed services timely, (2) decisions must be posted publicly on the [Lido Research Forum](https://research.lido.fi/) prior to any action being taken on-chain, (3) and the DAO and community are given a reasonable amount of time to consider. Until the migration of the relay lists management to Lido Easy Track, the DAO retains the right to final decisions and community members may post [Snapshot votes](https://snapshot.org/#/lido-snapshot.eth) to change or counteract RMC decisions and/or reconstitute the RMC with different participants.<br /> Since the successful full-scale adoption and until an in-protocol solution is released by Ethereum, Lido has entered the "PBS lite" phase, in which solutions that can achieve the goals outlined by this policy alternatively to MEV-boost are equally permitted -- i.e. the implementations of the Builder API in the various validator clients and Vouch's MEV service.
+Following [The Merge](https://ethereum.org/en/roadmap/merge/), NOs were requested to set up and use MEV-boost for validators that they operate as part of the Lido on Ethereum protocol via a soft-rollout approach. They were asked to use as many of the [relays which had signaled interest for inclusion](https://research.lido.fi/t/lido-on-ethereum-call-for-relay-providers/2844) as possible to test their efficacy and performance.<br /> In parallel to the soft-rollout, the DAO [gained approval](https://snapshot.org/#/lido-snapshot.eth/proposal/0x7ac2431dc0eddcad4a02ba220a19f451ab6b064a0eaef961ed386dc573722a7f) to identify and constitute a set of multi-sig participants with the authority to determine which relays should be added to and moved between the initial "must-include" and "allow list" ([relay lists](https://etherscan.io/address/0xf95f069f9ad107938f6ba802a3da87892298610e#readContract)) of the full-scale MEV-boost adoption. The [Relay Maintenance Committee (RMC)](https://research.lido.fi/t/lido-on-ethereum-identify-and-constitute-relay-maintenance-committee/3386) has since served this role under the conditions that (1) it reacts to prospect relays, a decline in performance and/or discontinuation of prescribed services timely, (2) decisions must be posted publicly on the [Lido Research Forum](https://research.lido.fi/) prior to any action being taken on-chain, (3) and the DAO and community are given a reasonable amount of time to consider. Until the migration of the relay lists management to Lido Easy Track, the DAO retains the right to final decisions and community members may post [Snapshot votes](https://snapshot.org/#/lido-snapshot.eth) to change or counteract RMC decisions and/or reconstitute the RMC with different participants.<br /> Since the successful full-scale adoption and until an in-protocol solution is released by Ethereum, Lido has entered the "PBS lite" phase, in which solutions that can achieve the goals outlined by this policy alternatively to MEV-boost are equally permitted -- i.e. the implementations of the Builder API in the various validator clients and Vouch's MEV service.
 
 Following and going forward, NOs are expected to adhere to the following:
 
@@ -152,25 +152,25 @@ At least every six months or whenever there are significant upgrades or new rele
 ## E. Definitions
 
 ##### Block Builder
-The agent responsible for assembling the potential contents of a block, i.e. the set of transactions that makes up the "payload" of a block. In Proof-of-Work (PoW) Ethereum it was the miner. In Proof-of-Stake (PoS) Ethereum it is the validator, but this activity can be separated from the validator via PBS, in which case block builders need to submit bids for blocks to be included to the block proposer for inclusion.
+The agent responsible for assembling the potential contents of a block, i.e. the set of transactions that makes up its "payload". In [Proof-of-Work (PoW) Ethereum](https://ethereum.org/en/developers/docs/consensus-mechanisms/pow/) it was the miner. In [Proof-of-Stake (PoS) Ethereum](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/) it is the validator, but this activity can be separated from the validator via [PBS](#Proposer-Builder-Separation-PBS), in which case block builders need to submit bids for blocks to be included to the [block proposer](#Block-Proposer) for inclusion.
 
 ##### Block Proposer
-The agent responsible for proposing new blocks in a blockchain. In PoW Ethereum it was the miner, in PoS Ethereum it is the validator.
+The agent responsible for proposing new blocks in a blockchain. In PoW Ethereum it was the miner, in PoS Ethereum it is the [validator](#Validator).
 
 ##### Community Staking Module (CSM)
-Third Staking Router module for permissionless NO entry to the Lido on Ethereum protocol, primarily intended for solo and community stakers.
+Third [Staking Router](#Staking-Router) module for permissionless NO entry to the Lido on Ethereum protocol, primarily intended for solo and community stakers.
 
-##### Curated Module
-First Staking Router module utilizing the `NodeoperatorRegistry` contract for permissioned, DAO-controlled registry of curated NOs as known from Lido on Ethereum V1.
+##### Curated Module (CM)
+First [Staking Router](#Staking-Router) module utilizing the `NodeoperatorRegistry` contract for permissioned, DAO-controlled registry of curated NOs as known from Lido on Ethereum V1.
 
 ##### Lido V2
-Upgrade to the Lido on Ethereum protocol pushing towards increased decentralization by introduction of the modular Staking Router architecture. See https://blog.lido.fi/lido-v2-launch/. 
+Upgrade to the Lido on Ethereum protocol pushing towards increased decentralization by introduction of the modular [Staking Router](#Staking-Router) architecture. See https://blog.lido.fi/lido-v2-launch/. 
 
 ##### Maximal Extractable Value (MEV)
 See https://ethereum.org/developers/docs/mev.
 
 ##### Node Operator (NO)
-A person/organization/entity etc. that operates validators. In the context of this policy, one that does so as a part of the Lido on Ethereum protocol.
+A person/organization/entity etc. that operates [validators](#Validator). In the context of this policy, one that does so as a part of the Lido on Ethereum protocol.
 
 ##### Proposer/Builder Separation (PBS)
 See https://ethereum.org/roadmap/pbs#proposer-builder-separation and https://members.delphidigital.io/reports/the-hitchhikers-guide-to-ethereum/ (section "In-protocol Proposer-Builder Separation").
@@ -179,16 +179,16 @@ See https://ethereum.org/roadmap/pbs#proposer-builder-separation and https://mem
 See https://ethereum.org/en/developers/docs/gas/#priority-fee.
 
 ##### Validator
-In the context of this policy, validators operated by third-party NOs for the Lido on Ethereum protocol. See https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/#validators.
+In the context of this policy, [validators](#Validator) operated by third-party [node operators](#Node-Operator-NO) for the Lido on Ethereum protocol. See https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/#validators.
 
-##### Simple Distributed Validator Technology Module (Simple DVT or SDVT)
-See https://blog.lido.fi/leveraging-distributed-validator-technology/. Second Staking Router module utilizing [Distributed validator Technology (DVT)](https://ethereum.org/staking/dvt) through [Obol Network](https://obol.tech/) and [SSV Network](https://ssv.network/) implementations. This module is referred to as "Simple DVT" due to the manual coordination and curation required to adopt this early-stage technology and to reflect that this module is not intended for indefinite and "at-scale" use.
+##### Simple Distributed Validator Technology Module (Simple DVT, SDVT or SDVTM)
+Second [Staking Router](#Staking-Router) module utilizing the `NodeoperatorRegistry` contract, [Distributed Validator Technology (DVT)](https://ethereum.org/staking/dvt) through [Obol Network](https://obol.tech/) and [SSV Network](https://ssv.network/) implementations for permissioned, DAO-controlled registry of [node operators](#Node-Operator-NO). This module is referred to as "Simple DVT" due to the manual coordination and curation required to adopt this early-stage technology and to reflect that this module is not intended for indefinite and "at-scale" use. See https://blog.lido.fi/leveraging-distributed-validator-technology/. 
 
 ##### Staker
-In the context of this policy, a person/organization/entity etc. which provides ETH to a validator and thus holds (w)stETH.
+In the context of this policy, a person/organization/entity etc. which provides ETH to a Lido on Ethereum [validator](#Validator) and thus holds (w)stETH.
 
 ##### Staking Router
-New modular architectural design of the Lido on Ethereum protocol that allows for the development of on-ramps for new NOs, ranging from solo stakers to DAOs and DVT clusters.
+New modular architectural design of the Lido on Ethereum protocol that allows for the development of on-ramps for new [node operators](#Node-Operator-NO), ranging from solo stakers to DAOs and DVT clusters.
 
 ## F. Related Documents & References
 
@@ -196,31 +196,30 @@ New modular architectural design of the Lido on Ethereum protocol that allows fo
 
 |Version|Date|Description|
 |-|-|-|
-|0.1|Aug 10, 2022|Initial policy creation (DRAFT)|
-|1.0|Sep 7, 2022|First version of policy with MEV-boost soft-rollout proposed to DAO|
-|2.0|Oct 24, 2022|Second version of policy with MEV-boost full-scale rollout|
-|3.0|Q1, 2024|Third version of policy with extension to Simple DVT module and transition to PBS lite operation|
-
+|0.1|2022-08-10|Initial policy creation (DRAFT)|
+|1.0|2022-09-07|First version of policy with MEV-boost soft-rollout proposed to DAO|
+|2.0|2022-10-24|Second version of policy with MEV-boost full-scale rollout|
+|3.0|2024-07-XX|Third version of policy with transition to PBS lite and extension to Simple DVT and Community Staking|
 
 # Appendix A - Detailed Lido MEV Implementations
 
 ## Appendix A.1 MEV-Boost
 
 ### A.1.I Configuration
-NOs should ensure that validators that they are running for Lido are properly registered with the relevant relays as explained in [A.1.II Relays](#A.1.II-Relays) and [D.5 Currently Prescribed Solutions](#D5-Currently-Prescribed-Solutions).
+NOs should ensure that validators that they are running for Lido on Ethereum are properly registered with the relevant relays as explained in [A.1.II Relays](#A.1.II-Relays) and [D.5 Currently Prescribed Solutions](#D5-Currently-Prescribed-Solutions).
 
 ### A.1.II Relays
-In MEV-boost, relays can be configured at a per-validator level. The expectation is that Lido NOs would ensure that for all validators that are being run as a part of the Lido on Ethereum protocol, the appropriate list of relays is regularly updated and correctly configured.
+In MEV-boost, relays can be configured at a per-validator level. The expectation is that Lido NOs would ensure that for all validators that are being run as a part of the protocol, the appropriate list of relays is regularly updated and correctly configured.
 
 Currently, MEV-boost software run by the NO is not able to evaluate and assess, e.g. via simulation, whether the reward in the block received from the block builder is correct, so it cannot drop “bad” or “underpaid” blocks.
 
 As an immediate practical solution, relays will basically need to be trusted to do this, which is in part why Flashbots aims to build a [monitoring and reputation system](https://github.com/flashbots/mev-boost/issues/142) for relays.
 
-As a result, if using MEV-boost, Lido should adopt the following requirements with regards to use of relays by Lido NOs:
+As a result, if using MEV-boost, Lido on Ethereum should adopt the following requirements with regards to use of relays by Lido NOs:
 1. The Lido DAO, via the RMC, will maintain two lists of MEV-boost relays:
     1. A must-include list -- vetted relays that are considered trustworthy, well-operated, and reliable
-    2. An allow list -- approved but perhaps less well-known or battle-tested relays which can be trialled prior to inclusion in the must-include list
-2. For validators which they run as a part of the Lido protocol, NOs should configure their MEV-boost instances to connect to as many of the relays included in the must include list as possible, based on each NO's risk and legal assessment. Additionally and optionally, they may include any of the relays included in the allow list. NOs should not source blocks from relays not included in either list.
+    2. An allow list -- approved, but less well-known or battle-tested relays which can be trialled prior to inclusion in the must-include list
+2. For validators that they run as a part of the Lido on Ethereum protocol, NOs should configure their MEV-boost instances to connect to as many of the relays included in the must include list as possible -- based on each NO's risk and legal assessment. Additionally, and optionally, they may include any of the relays included in the allow list. NOs should not source blocks from relays not included in either list.
 3. Both the must include and the allow list should be maintained in such a way that they are:
     1. Relatively easily amendable -- in case relays should be considered for addition, e.g. via public request, or relays should be removed, e.g. for bad performance
     2. Publicly listed and easily retrievable by the public, by block builders, and by NOs
@@ -234,29 +233,27 @@ As a starting point, it is highly suggested that relays considered for inclusion
 
 ### A.1.III Monitoring
 
-Spec is being refined as MEV-boost specs and relay API are being finalized, meanwhile please refer to https://hackmd.io/@george-avs/SyGqpItIc for the general gist.
-
-Monitoring was implemented (note of Nommiebot?), [provided for individual setup](https://github.com/lidofinance/ethereum-validators-monitoring) or leveraged, e.g. from third parties supported by [Lido ecosystem grants](https://research.lido.fi/t/rfp-ethereum-censorability-monitor/3330), to:
+Monitoring was implemented, made publicly accessible through channels such as the [Lido Fees Dashboard](https://fees-monitoring.lido.fi/), provided for individual setup like the [Ethereum-Validators-Monitoring (E-V-M)](https://github.com/lidofinance/ethereum-validators-monitoring) or leveraged, e.g. from third parties supported by Lido ecosystem grants such as [Beaconcha.in](https://research.lido.fi/t/beaconcha-in-block-explorer/2465), [Rated Network](https://research.lido.fi/t/lido-x-rated-api-grant-proposal/2811), and [Neutrality Watch](https://research.lido.fi/t/rfp-ethereum-censorability-monitor/3330), to go along other community resources like Toni Wahrstätter's [MEV-Boost Dashboard](https://mevboost.pics/). 
 
 ### A.1.IV Block Production & Relay Troubleshooting
 
-In case that operational issues are noticed - e.g. blocks not produced as expected, blocks not being timely unblinded, blocks not being timely created and propagated, blocks being invalid, relays not providing agreed upon data or monitoring APIs, etc. - the NO should temporarily disable the relevant relay(s) until such a time that:
-* (a) The service is sufficiently and satisfactorily restored, or 
-* (b) The DAO and NOs collectively decide that the relay(s) should no longer be used and removed from the relevant vetted list, at which point a DAO vote should be made to do so
+In case that operational issues are noticed - e.g. blocks not being produced as expected, timely unblinded, timely created and propagated or being invalid, or relays not providing agreed upon data or monitoring APIs, etc. - the NO should temporarily disable the relevant relay(s) until such a time that:
+* The service is sufficiently and satisfactorily restored, or 
+* The DAO and NOs collectively decide that the relay(s) should no longer be used and removed from the relevant vetted list, at which point a DAO vote should be made to do so
 
 In these cases, the NO should also:
 * Timely inform the rest of the Lido NO community about the issues identified
 * Reach out to the Lido node operator mechanisms (NOM) contributors to notify them of the issues
 * Reach out to the relay operator to understand the source of the issue and report back
 
-If a NO is found to be "under-performing" as per the mechanism described in [D.4 Monitoring & Penalties](#D4-Monitoring--Penalties) but this is due to issues stemming from a bad relay or malicious block builders interfering with block production, then the NO will not be considered out of compliance with the policy. 
+If a NO is found to be "under-performing" as per the mechanism described in [D.4 Monitoring & Penalties](#D4-Monitoring--Penalties) but this is due to issues stemming from a bad relay or malicious block builder interfering with block production, then the NO will not be considered out of compliance with the policy. 
 
 ### A.1.V Relay and Relay Operator Responsibilities & Incident Management
 Given the trusted nature of relays in the MEV-boost context, it behooves relay operators to ensure that they and the relays they operate function effectively, performantly, and efficiently, and that any and all communications are made timely and professionally. 
 
-Relay operators should notify relevant Lido protocol participants - e.g. NOs and the NOM workstream - as soon as possible upon identification of an issue with any of the relays that they operate. Notification may be performed through public ([Lido Research forum](https://research.lido.fi/), Lido Discord, etc.) and/or private channels (e.g. group chats) available to them, so that NOs can proceed with appropriate changes to their MEV-boost configurations.
+Relay operators should notify relevant Lido on Ethereum protocol participants - e.g. NOs and the NOM workstream - as soon as possible upon identification of an issue with any of the relays that they operate. Notification may be performed through public and/or private channels - e.g. the Lido Research Forum, Lido Discord, group chats, etc. - so that NOs can proceed with appropriate changes to their MEV-boost configurations.
 
-During an incident, relay operators should provide regular updates with regards to the status of the incident. Following the conclusion of the incident, relay operators should provide an incident report or post-mortem that details at minimum the root cause, fixes performed, if/how soon the relay will be back in service, and what steps have been undertaken to prevent the likelihood of similar incidents in the future. Additionally, in cases where block production was adversely affected (see [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production--Relay-Troubleshooting)), relay operators should advise as to what steps will be taken, if any, to reimburse validators for any missed/lost/invalid/etc. blocks and/or incorrect/invalid/inaccurate bids.
+During an incident, relay operators should provide regular updates with regards to the status of the incident. Following the conclusion of the incident, relay operators should provide an incident report or post-mortem that details at minimum the root cause, fixes performed, if/how soon the relay will be back in service, and what steps have been undertaken to prevent the likelihood of similar incidents in the future. Additionally, in cases where block production was adversely affected - see [A.1.IV Block Production & Relay Troubleshooting](#A1IV-Block-Production--Relay-Troubleshooting) - relay operators should advise as to what steps will be taken, if any, to reimburse validators for any missed/lost/invalid/etc. blocks and/or incorrect/invalid/inaccurate bids.
 
 Incidents will be reviewed on an ad-hoc basis by the NO and Lido DAO communities. These reviews will inform DAO decisions, via vote, regarding whether relay operators and the relays that they operate will continue to be considered vetted and ratified for use by NOs or not.
 

@@ -1,7 +1,7 @@
 # Lido on Ethereum Standard Node Operator Protocol - Validator Exits
 
 ```markdown!
-STATUS: V2.0 (Q4/2024 - Introduction of Triggerable Withdrawals: SR 2.0 Upgrade & Extension to SDVTM & CSM)
+STATUS: V2.0
 ```
 
 ## A - Purpose

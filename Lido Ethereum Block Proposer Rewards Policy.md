@@ -1,11 +1,11 @@
-# Lido on Ethereum Standard Node Operator Protocol - Block Proposals & Auxiliary Proposer Mechanisms
+# Lido on Ethereum Standard Node Operator Protocol - Block Proposals
 
 ```markdown!
 STATUS: V3.0
 ```
 
 ## A - Purpose
-This Standard Node Operator Protocol (SNOP) outlines the standards, infrastructure and Auxiliary Proposer Mechanisms (APMs) available for block proposals in Ethereum (see [Appendix A](#appendix-a---ethereum-block-proposal-standards-infrastructure--auxiliary-proposer-mechanisms)); the rules around the usage of this SNOP; the considerations that guide the expectations of Lido on Ethereum (LoE) with regard to block proposals and APMs; the responsibilities Node Operators (NOs) using LoE have in performing block proposals, providing APMs and distributing the rewards that accrue from those actions to the stakers; the solutions employed to monitor the NOs’ activities, and the actions that NOs can expected in case of non-conformance with this SNOP.
+This Standard Node Operator Protocol (SNOP) outlines the standards, infrastructure and Auxiliary Proposer Mechanisms (APMs) available for block proposals in Ethereum (see [Appendix A](#appendix-a---ethereum-standards-infrastructure--auxiliary-proposer-mechanisms)); the rules around the usage of this SNOP; the considerations that guide the expectations of Lido on Ethereum (LoE) with regard to block proposals and APMs; the responsibilities Node Operators (NOs) using LoE have in performing block proposals, providing APMs and distributing the rewards that accrue from those actions to the stakers; the solutions employed to monitor the NOs’ activities, and the actions that NOs can expected in case of non-conformance with this SNOP.
 
 ## B - Scope
 This SNOP applies to LoE, the NOs who use one or more of the [Staking Router (SR)'s](https://docs.lido.fi/contracts/staking-router) [Curated Module (CM)](https://operatorportal.lido.fi/modules/curated-module), [Simple Distributed Validator Technology Module (SDVTM)](https://operatorportal.lido.fi/modules/simple-dvt-module), [Community Staking Module (CSM)](https://operatorportal.lido.fi/modules/community-staking-module), and any future Staking Module (SM), and the validators the NOs operate as part of the Liquid Staking Protocol (LSP).
@@ -23,36 +23,34 @@ Validator|A validator, also referred to as a "key" in this SNOP, is the technica
 Constituted in the [Lido DAO Vibe](https://snapshot.org/#/s:lido-snapshot.eth/proposal/0x739fbe56425d355b5e41c22bb346b7a8217afd9e84aa49863648b1c641a482e3) and iterated upon by the community in a regularly performed [Guided Open Objective Setting Exercise (GOOSE)](https://snapshot.org/#/s:lido-snapshot.eth/proposal/0x58bbc5d540e46081043ef29d4d1ee56b7df4dc1b0369aa78e0c15a2403549353), Lido strives to contribute to the decentralization, accessibility, and censorship resistance of Ethereum through the provision of simple and secure staking for the ecosystem. The following guiding considerations for the expectations, practical implementation, and utilization of LoE are derived from these overarching goals.
 
 ### C.1 - Economic Security
-Outlined in [Hasu's proposal on Maximal Extractable Value (MEV)](https://research.lido.fi/t/proposal-optimal-mev-policy-for-lido/2489), the game-theoretical best approach for LoE to preserve the security of Ethereum's Proof-of-Stake (PoS) consensus against 51% attacks, stakers' low threshold access to Decentralized Finance (DeFi) opportunities, and the positive impact that the protocol can have on the network through efforts towards the decentralization and censorship resistance of the validator set, is by optimizing for LoE's economic competitiveness.
+Outlined in [Hasu's proposal on Maximal Extractable Value (MEV)](https://research.lido.fi/t/proposal-optimal-mev-policy-for-lido/2489), the game-theoretical best approach for LoE to preserve the security of Ethereum's Proof-of-Stake (PoS) consensus against 51% attacks, stakers' low threshold access to Decentralized Finance (DeFi), and the positive impact that the protocol can have on the network through efforts towards the decentralization and censorship resistance of the validator set, is by optimizing for LoE's economic competitiveness.
 
 Pursuing this goal primarily calls for the maximization of the protocol's staking APR by enabling NOs using LoE to fulfill the Ethereum validator duties - attesting to and proposing new blocks, participating in sync committees, and reporting network violations of the slashing rules - as reliably, timely, correctly, and free of slashable offenses as possible.
 
-Beyond that, LoE should continue on its path of leading the adoption of the latest native and Ethereum-aligned standards, infrastructure, and developments that could profoundly change the staking landscape and/or impact stakers economically - like historically it did with the introduction of proposer-builder separation (PBS) and, most recently, APMs.
+Beyond that, the leading adoption of the latest native and Ethereum-aligned standards, infrastructure, and developments that have the potential to profoundly change the staking landscape and/or impact stakers economically should be continued.
 
-Unlike rewards for the fulfillment of duties on the Consensus Layer (CL), compensations for services on the Execution Layer (EL) are not automatically issued to a validator's account by the Ethereum protocol, but accrue on an NO-determined address, i.a., in the form of MEV extracted or [priority fees](https://ethereum.org/en/developers/docs/gas/#priority-fee) directly sent by users to incentivize the inclusion of their transactions. This architectural design carries the risk that NOs using LoE could try to hide directly received EL rewards in an attempt to earn more than their rightful share of the protocol's smoothed rewards. In the best interest of stakers and honest NOs, LoE must thus make rewards stealing as prohibitively difficult to conceal and expensive to execute as possible. Irrespective of whether for a [bonded SM](https://operatorportal.lido.fi/modules/community-staking-module#block-88e6d7eca6364a758541dc1ee66a278f) such as CSM, with, by principle, more far-reaching options for automated enforcement of rules, or a module based on social reputation - to ensure fair conditions in all SMs, it is essential to seamlessly and transparently monitor NO behavior around block proposals and rewards distribution, as is realized for LoE via a multitude of community-built open-source [tools](https://operatorportal.lido.fi/existing-operator-portal/ethereum-onboarding/no-resources-tooling) and [dashboards](https://operatorportal.lido.fi/operator-statistics-and-metrics).
+Unlike rewards for the fulfillment of duties on the Consensus Layer (CL), the compensations for services on the Execution Layer (EL) are not automatically issued to a validator's account by the Ethereum protocol, but accrue on an NO-determined address -- e.g. in the form of MEV extracted and [priority fees](https://ethereum.org/en/developers/docs/gas/#priority-fee) sent by users to incentivize the inclusion of their transactions. This architecture carries the risk that NOs using LoE could try to hide EL rewards directly received in an attempt to earn more than their rightful share of the protocol's smoothed rewards. In the best interest of stakers and honest NOs, rewards stealing in LoE must be as prohibitively difficult to conceal and expensive to execute as possible. Irrespective if for a [bonded SM](https://operatorportal.lido.fi/modules/community-staking-module#block-88e6d7eca6364a758541dc1ee66a278f) such as CSM, with by design more options for automated enforcement of rules, or a module based on social reputation -- to ensure fair conditions in all SMs, it is essential to continuously and transparently monitor NO behavior around block proposals and rewards distribution. For this purpose, a multitude of community-built open-source [tools](https://operatorportal.lido.fi/existing-operator-portal/ethereum-onboarding/no-resources-tooling) and [dashboards](https://operatorportal.lido.fi/operator-statistics-and-metrics) are available for LoE.
 
-In the context of APMs, attention is to be paid to the careful consideration of potential implications the implementation of new mechanisms into the protocol may have on the block construction value chain, and that any benefits that may be gained in certain areas are measured against potential losses in others - specifically with respect to the resulting value of blocks proposed by NOs using LoE.
+In the context of APMs, attention is to be paid to the careful consideration of potential implications the implementation of new mechanisms into the protocol may have on the block construction and proposal value chain, and that any benefits that may be gained in certain areas are measured against potential losses in others -- specifically with respect to the resulting value of blocks proposed by NOs using LoE.
 
 ### C.2 - Decentralization
-Decentralization is not only one of the core values of the Lido DAO, its prevalence, just like that of economic security, is an integral prerequisite for the robustness of the Ethereum network - only in a more technical-operational sense. For this reason, the hitherto outlined optimization of LoE block proposals solely for economic security must be expanded and weighed up with aspects of decentralization to provide the holistic guidance this SNOP aspires to offer.
+Decentralization is one of the core values of the Lido DAO and its prevalence, just like that of economic security, an integral premise for the robustness of the Ethereum network -- comparatively only in a more technical-operational sense. For this reason, the hitherto outlined optimization of LoE solely for economic security must be expanded and weighed up with aspects of decentralization to provide the holistic guidance this SNOP seeks to offer.
 
-The heeding of decentralization is most apparently reflected in LoE's continuous encouragement of NOs to run more diverse setups, for example in terms of the geographic dispersion, infrastructure and clients utilized to run nodes, and thus proactively mitigate the risks of local outages and isolated bugs, as well as to globally reduce Ethereum p2p latencies. These efforts are only possible due to LoE deliberately affording NOs a performance margin that allows even those from underrepresented regions and such with setups that are not primarily geared towards maximize rewards to equitably participate and valuably contribute to the system.
+Diverse setups, i.a., in terms of the geographic dispersion, infrastructure and clients utilized to run nodes, are critical to proactively mitigate risks of local outages, isolated bugs, and to globally reduce Ethereum p2p latencies. NOs using LoE are encouraged to drive the sustained efforts to achieve those goals and are thus afforded a performance margin that allows even those from underrepresented regions and such with setups that are not primarily geared towards rewards maximization to equitably participate and valuably contribute to the system.
 
-For the Lido community, the ongoing improvement of Ethereum is at the heart of all considerations. By LoE pursuing an approach to introduce the ecosystem's latest standards and mechanisms with foresight, the network has repeatedly benefited from being able to carry out critical transformations with the support of a broad set of well-coordinated and professional NOs with as little risk as possible. The prime example of this was the widespread adoption of MEV-Boost as the closest equivalent to the introduction of a native (“enshrined”) implementation of PBS, which Ethereum seeks to reduce the complexity of validation, to separate the authorities of block building and proposing, and to prevent the centralization of MEV.
+For the Lido community, the ongoing improvement of Ethereum is at the heart of all interests. Therefore, the active involvement in discussions on the latest developments and their directional introduction into LoE should continue, so that in the process of sensitive transformations the network can remain to count on the assistance of a broad set of well-coordinated and proficient NOs.
 
-An important addition is the mention of LoE's commitment to credible neutrality. This means that not only the first available or most popular implementation of an APM is supported by the protocol, but any solution that implements a mechanism's underlying standard(s) in a way that may be technically unique, but verifiably strives for the goals intended by the authors of the standard(s), is not in breach with the spirit of Ethereum or this SNOP, and whose desired application was proactively communicated.
-
-The embodiment of the two aforementioned considerations is the launch of the SDVTM. The extensive upfront testing of infrastructure and potential NOs, as well as the careful stepwise rollout to mainnet, have significantly contributed to the growth of empirical knowledge about and the maturity of both the Obol and SSV solutions, leading to a present where everyone - but especially solo and community stakers - can benefit from the advantages of DVT in form of shared responsibilities and technical redundancy. Due to this success, many of the measures taken have and will continue to serve as blueprints for future LoE forays like the introduction of new SMs, APMs or the collaborative tuning of Ethereum parameters such as the block gas limit.
+Another important aspect of decentralization is credible neutrality. For LoE, this means that not only the first available or most popular implementation of an APM should be supported by the protocol, but any solution that is not in conflict with the spirit of Ethereum or this SNOP, demonstrably strives for the goals intended by the authors of the underlying standard(s), the inclusion of which was publicly proposed - e.g. on the [Lido Research Forum](https://research.lido.fi/) - and whose technology has been thoroughly tested.
 
 ### C.3 - Censorship Resistance
-A third topic of key importance for Ethereum and a factor for LoE to balance against the dimensions of economic security and decentralization, is censorship resistance. Even with the introduction of the current form of PBS and the associated dissolution of the validators' previous monopoly over the inclusion and ordering of transactions, Ethereum users can be, and are, censored at various points along the block construction and proposal pipelines. In fact, [it has been documented](https://censorship.pics/) that it is most rarely the validators that do not propose blocks that include certain transactions, but rather builders that disregard those transactions when constructing payloads, or relays that refuse to broadcast corresponding payloads to the network [which cause inclusion delays](https://eth.neutralitywatch.com/). But of course there are also some validators that are only connected to censoring relays and do not take all transactions into account when building local (“vanilla”) blocks.
+A third attribute of key importance to Ethereum, and a factor for LoE to balance the dimensions of economic security and decentralization against, is censorship resistance.
 
-As stated already in relation to the implementation of specific mechanisms in the section on decentralization, LoE is firmly committed to credible neutrality and therefore also rejects the censorship of transactions. Every user who respects the rules of the network should be able to participate in the public good that is Ethereum without restrictions. The community acknowledges that some NOs using LoE are not able to ensure unrestricted access to the network due to the regulatory requirements of the jurisdictions in which they operate, but calls on all NOs to continuously try push the boundaries towards more freedom through exemplary behavior.
+Even with the current form of out-of-protocol proposer-builder separation (PBS) and the resulting dissolution of the validators' former monopoly over transaction inclusion and ordering (see [Appendix A.4.1 ff](#a41---proposer-builder-separation)), Ethereum users can still be censored at various points along the block construction and proposal pipeline. In fact, [it has been shown](https://censorship.pics/) that recently it is most rarely the validators that do not propose blocks that include transactions from certain addresses, but rather builders that disregard them when constructing payloads and/or relays that refuse to broadcast such to the network, that cause [censorship latency ("inclusion delay")](https://eth.neutralitywatch.com/). Of course, though, there are also validators that are only connected to censoring relays and/or do not take all transactions into account when building local blocks (see [Appendix A.3](#a3---local-block-building)).
 
-On a related note, even if practically difficult to guarantee for payloads obtained from the open builder market, are the NOs using LoE hereby reminded to act fairly in local block construction and to not take any unethical measures to the detriment of users or solely to their own benefit - such as sandwich attacks.
+As outlined in section decentralization (see [C.2](#c2---decentralization)), for the operational health of Ethereum, LoE should foster credible neutrality, which - in regards to the users - logically extends to the rejection of the censorship of transactions. Every user who respects the rules of the network should be able to participate in the public good that is Ethereum without restrictions. It is acknowledged that some NOs using LoE are not able to provide unrestricted access to the network due to the regulatory requirements of the jurisdictions they operate in, yet all NOs are called upon to continually seek to push the boundaries towards greater freedom through thought leadership and exemplary behavior.
 
 ## D - Node Operator Responsibilities
-### D.1 - Must Use Some & Allowed MEV Relays Lists
+### D.1 - Must Use Some & Allowed MEV Relay Lists
 Scope: All NOs of all Lido SR SMs <br>
 Responsibility: Each NO must configure at least one entry of "must use some list", may configure any amount of entries of "allow list", but no relay (yet) unvetted from the Relay Maintenance Committee (RMC) <br>
 References:
@@ -85,9 +83,9 @@ Open Questions/Action Items:
 * Define point of reference in time of slot to assess bid availability & sizes
 * Formalize enforcement mechanisms and penalty structure for CM & SDVT as well as CSM
 
-### D.2 - Min-Bid & Builder Boost Factor
+### D.2 - Min-Bid & Boost Factors
 Scope: All NOs of all Lido SR SMs <br>
-Responsibility: Until Ethereum's implementation and LoE's adoption of EIP-7805: Fork-choice enforced Inclusion Lists (FOCIL), each NO may configure the validator client parameters "min-bid" and/or "builder boost factor" according to the socially agreed upon values to allow for a certain amount of local block building, including some otherwise censored transactions from the public mempool <br>
+Responsibility: Until Ethereum's implementation and LoE's adoption of EIP-7805: Fork-choice enforced Inclusion Lists (FOCIL), each NO may configure the validator client parameters "min-bid" and/or "builder/local block value boost factor" according to the socially agreed upon values to allow for a certain amount of local block building, including some otherwise censored transactions from the public mempool <br>
 
 References:
 * EIP-7805 FOCIL https://eips.ethereum.org/EIPS/eip-7805
@@ -137,9 +135,7 @@ Open Questions/Action Items:
 * Agree on approach
 * Formalize enforcement mechanisms and penalty structure for CM & SDVT as well as CSM
 
-### D.4 - APMs
-
-### D.5 - Fee Recipient
+### D.4 - Fee Recipient
 Scope: All NOs of all Lido SR SMs <br>
 Responsibility: Each NO must configure the fee recipient of the validators run for LoE to the `LidoExecutionLayerRewardsVault` of the respective Ethereum network to fairly distribute the priority fees directly received, MEV extracted, and APM compensations earned with the system. <br>
 References:
@@ -157,27 +153,63 @@ Potential breach, fees monitoring label & detection logic:
 
 Consequences of non-conformance & way to enforce:
 * CM & SDVT - Currently no formalized consequence, once alerted, a NOM contributor reaches out to the NO to investigate the case and ask for a refund of the rewards stolen.
-* CSM - Once detected, the NO is afforded a negotiation period with the CSM Committee to compensate for the stolen rewards and an additional fine of 0.1 ETH. If no compensation is made during the negotiation period, the CSM Committee initiates an Easy Track motion to propose to the Lido DAO that the portion of the NO's bond that was confiscated upon detection of the breach be burned as a penalty. Any of the NO's validators that fail to provide a full bond - i.e are unbonded - as a result of this measure are requested to exit by the Validators Exit Bus Oracle (VEBO). If subsequently the validators are not exited, they are marked stuck, and no operator rewards are distributed to the NO until the stuck validators are exited. After the implementation of EIP-7002: Execution Layer Triggerable Withdrawals into LoE, stuck validators will instead be forcefully ejected at Lido protocol level.
+* CSM - When a proposal with an incorrect fee recipient is detected, an amount of the affected NO's bond equal to the block reward and an additional disincentive of 0.1 ETH is locked for 8 weeks, and the NO is afforded a challenge period to discuss the situation in the CSM Support section of the Lido Research Forum. Once the NO compensates LoE for the incident or upon expiry of the challenge period, if an agreement has been reached with the community that force majeure was the cause of the event, the lock on the bond is lifted. If otherwise neither an agreement can be reached nor the compensation is being paid, the CSM Committee will initiate an Easy Track motion to propose to the Lido DAO that the locked portion of the NO's bond be burned as a penalty. Any of the NO's validators that fail to provide a full bond - i.e. become unbonded - as a result of this measure are requested to exit the protocol by the Validators Exit Bus Oracle (VEBO). If the requested validators are not exited, they are marked stuck, and no operator rewards are distributed to the NO until the stuck keys are exited. After the implementation of [EIP-7002: Execution Layer Triggerable Withdrawals](https://eips.ethereum.org/EIPS/eip-7002) into LoE, stuck validators will instead be forcefully ejected at the protocol level.
 
 Open Questions/Action Items:
 * Formalize enforcement mechanisms and penalty structure for CM & SDVT
 
-### D.6 - Gas Limit
-?
-
 # Appendix
-## Appendix A - Ethereum Block Proposal Standards, Infrastructure & Auxiliary Proposer Mechanisms
+## Appendix A - Ethereum Standards, Infrastructure & Auxiliary Proposer Mechanisms
 ### A.1 - Beacon Node API
-### A.2 - Local Block Building
-### A.3 - Builder API
+[Application programming interface (API)](https://ethereum.github.io/beacon-APIs) exposed by a beacon node (BN) - either as consensus client (CC) or validator client (VC) implementation - to query and participate in the Beacon Chain (BC) according to [Ethereum's consensus specification](https://github.com/ethereum/consensus-specs). In the context of this SNOP, relevant both as a prerequisite for validator nodes to fulfill fundamental duties and to allow NOs using LoE to customize their block proposal approaches. 
+
+### A.2 - Advancing the State of Ethereum
+The process of advancing Ethereum's state is based on attaching new blocks of information to the blockchain and begins with the PoS consensus pseudo-randomly assigning the block proposal duty for an upcoming slot to one of the active validators. Once the slot arrives, the assigned validator proposes by compiling a [plurality of CL and EL data](https://ethereum.org/en/developers/docs/blocks/#block-anatomy) into a block, signing, and broadcasting it to the network. Subsequently, the other validators check the proposed block and, if the required supermajority attests to its validity, the block is appended to the blockchain, updating the global state.
+
+Sometimes a validator fails to propose a block for an assigned slot -- the slot then remains empty, the state of Ethereum unchanged, and the affected block is referred to as missed. Another exception is a block that is temporarily part of the blockchain, but replaced before finalization by another block through mechanisms such as reorganizations (reorgs) or forks of [Ethereum's Gasper consensus algorithm](https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/gasper/). This can happen, e.g., because the proposed block was shared with the network too late to reach and obtain the attestations of a sufficient amount of validators, or because the chain split due to changes in the protocol rules or community disagreements about the future of Ethereum. Blocks that are abandoned during finalization, are called orphans.
+
+### A.3 - Local Block Building
+In local block building, the validator assigned for the proposal duty of a slot selects and orders to its preference the transactions to be included in the block from the local mempool of its execution client (EC). Those transactions may originate from the validator itself, from users who have sent them to the validator for inclusion, or from Ethereum's public mempool. The EC has access to the latter by participating in the EL gossip network, which allows the EC to collect transactions for its local mempool that are broadcast by other validators that have verified the validity of those transactions by successfully executing them on their local nodes.
+
+In the assigned slot and initiated by a request of its CC, the validator selects the transactions to be included, taking into account the gas limit of the block. The EC then locally executes the selected transactions in the specified order to obtain an updated state tree, the root of which it sends to the CC along a list of the included transactions -- the execution payload. Following this, the CC takes the state root and execution payload received, and together with a range of additional data, wraps them into a block. In further steps, the block is forwarded to the VC for signing and back to the CC for broadcasting to the network via the gossip protocol of the CL, so that finally the other validators can check the block's validity and vote on its appending.
+
+A block locally built on the node(s) of a validator is often referred to as vanilla.
+
+* https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/
+* https://ethereum.org/en/developers/docs/consensus-mechanisms/pos/block-proposal/
+* https://ethereum.org/en/developers/docs/networking-layer/#when-consensus-client-is-block-producer
+
 ### A.4 - Auxiliary Proposer Mechanisms
-#### A.4.1 - Out-Of-Protocol Proposer-Builder-Separation
-##### A.4.1.1 - Dedicated PBS Implementations
-##### A.4.1.2 - Consensus Clients
-##### A.4.1.3 - Multi-Beacon-Node Validator Clients
-##### A.4.1.4 - Distributed Validator Clients & Middleware
-#### A.4.2 - Proposer Commitments
-##### A.4.2.1 - Inclusion Preconfirmations
-### A.5 - Block Builders, Relay & Proposer Commitment Protocol Operators
+* https://www.notion.so/Preconfirmations-Landscape-and-Guiding-Considerations-184bf633d0c98069a5ccdc87e5770495#18bbf633d0c980929723c9eeff36840d
+
+#### A.4.1 - Proposer-Builder Separation
+[PBS](https://notes.ethereum.org/@vbuterin/pbs_censorship_resistance) is Ethereum's answer to the risk of block proposal centralization in the hands of the actors with the most resources to pursue sophisticated strategies to maximally extract MEV at the expense of those in the ecosystem, who are not able to manage the involved complexity equally efficiently, or who - directly or indirectly - have to pay for the cost of the measures taken by the sophisticated actors. PBS fixes this by separating two authorities that previously both resided with the validator -- to build the execution payload and to propose the block for a slot assigned by the network. (see [Local Block Building](#a3---local-block-building))
+
+##### A.4.1.1 - Builder API
+The [Builder API](https://ethereum.github.io/builder-specs) is [Ethereum's specification](https://github.com/ethereum/builder-specs) of a PBS solution that, while requiring greater trust assumptions, temporarily addresses block proposal centralization concerns by allowing the CCs of validators to source execution payloads from external builders until full ePBS becomes available.
+
+##### A.4.1.2 - Out-Of-Protocol PBS Implementations
+Out-of-protocol implementations serve as functionally as close as possible equivalents to a native Ethereum PBS mechanism, and define the standards and rules around the interactions of actors along the specialized block construction and proposal pipeline until [enshrined proposer-builder separation (ePBS)](https://eips.ethereum.org/EIPS/eip-7732) becomes implemented in the base protocol.
+
+MEV-Boost is the original implementation of out-of-protocol PBS, whose architecture was later used as basis for both the development of Ethereum's Builder API and Commit-Boost's PBS module, which, like Flashbot's own client, is a validator sidecar -- the node-side software that allows validators to permissionlessly participate in the MEV-Boost protocol.
+
+##### A.4.1.3 - Consensus Clients
+* Grandine (not production-ready)
+* Lighthouse
+* Lodestar
+* Nimbus
+* Prysm
+* Teku
+
+##### A.4.1.4 - Multi-Beacon-Node Validator Clients
+* Vero
+* Vouch
+
+##### A.4.1.5 - Distributed Validator Clients & Middleware
+* Obol Charon
+* SSV
+
+#### A.4.2 - Credible Proposer Commitments
+### A.5 - Builder, Relay & Credible Proposer Commitment Protocol Operators
 #### A.5.1 - Troubleshooting
 #### A.5.2 - Responsibilities & Incident Management

@@ -50,113 +50,37 @@ Even with the current form of out-of-protocol proposer-builder separation (PBS) 
 As outlined in section decentralization (see [C.2](#c2---decentralization)), for the operational health of Ethereum, LoE should foster credible neutrality, which - in regards to the users - logically extends to the rejection of the censorship of transactions. Every user who respects the rules of the network should be able to participate in the public good that is Ethereum without restrictions. It is acknowledged that some NOs using LoE are not able to provide unrestricted access to the network due to the regulatory requirements of the jurisdictions they operate in, yet all NOs are called upon to continually seek to push the boundaries towards greater freedom through thought leadership and exemplary behavior.
 
 ## D - Node Operator Responsibilities
-### D.1 - Must Use Some & Allowed MEV Relay Lists
-Scope: All NOs of all Lido SR SMs <br>
-Responsibility: Each NO must configure at least one entry of "must use some list", may configure any amount of entries of "allow list", but no relay (yet) unvetted from the Relay Maintenance Committee (RMC) <br>
-References:
-* Overview Node Operator Portal https://enchanted-direction-844.notion.site/6d369eb33f664487800b0dedfe32171e
-* MEV Boost Relay Allowed List Mainnet Contract https://etherscan.io/address/0xf95f069f9ad107938f6ba802a3da87892298610e
-* MEV Boost Relay Allowed List Holešky Contract https://holesky.etherscan.io/address/0x2d86C5855581194a386941806E38cA119E50aEA3
-* RMC Research Forum Thread https://research.lido.fi/t/lido-on-ethereum-identify-and-constitute-relay-maintenance-committee/3386
-* Fees Monitoring Payload Source Summary https://fees-monitoring.lido.fi/payloadSource
+Based on the guiding considerations, the following responsibilities arise for the NOs using LoE in respect to the configuration of their validators for the purpose of proposing blocks, and the minimum expected EL performance when fulfilling fundamental Ethereum duties as well as optional APM services. Moreover, this section outlines which consequences the NOs can expect in the event of non-conformance with this SNOP and in which cases the measures taken might differ between SMS due to their technical or operational differences.
 
-Potential breach, fees monitoring label & detection logic:
-* No PBS/vetted relay(s) or only unvetted relay(s) configured
-  * Label: Unknown Payload Source (PS)
-  * Criteria 1: Value of proposed block is above allowed min-bid threshold
-  * Criteria 2: Payload of proposed block is not found at "proposer payload delivered" endpoint of vetted relays' APIs
-  * Criteria 3: Bid above allowed min-bid threshold was available from at least one vetted relays at t=? of slot
-* No entry of "must use some list" configured
-  * Label: None yet
-  * Indicator: Blocks proposed from allowed list >> required list ~= 0 over certain period of time
-  * Criteria 1: Value of proposed block is above allowed min-bid threshold
-  * Criteria 2: Payload of proposed block is not found at "proposer payload delivered" endpoint of "must use some list" relays' APIs
-  * Criteria 3: Bid above allowed min-bid threshold was available from at least one "must use some list" relay at t=? of slot
-  * Criteria 4: Bid above payload value of bids of "allow list" relays was available from at least one "must use some list" relay at t=? of slot
+### D.1 - MEV Boost Relay Allowed List
+To foster Ethereum's decentralization and empower NOs who would otherwise not be able to economically viable compete with actors who pursue sophisticated strategies for maximal extraction of MEV, LoE supports out-of-protocol PBS according to the MEV-Boost specification (see [Appendix A.4.1 ff](#a41---proposer-builder-separation)). To ensure their reliability and values-alignment with Ethereum, each relay applying to serve LoE undergoes a vetting process by the [Relay Maintenance Committee (RMC)](https://research.lido.fi/t/lido-on-ethereum-identify-and-constitute-relay-maintenance-committee/3386).
 
-Consequences of non-conformance & way to enforce:
-* CM & SDVT - Currently no formalized consequence, once alerted, a NOM contributor reaches out to the NO to investigate the cause of the potential breach and may ask for a refund out of goodwill for a proven breach/non-refuted breach allegation
-* CSM - Currently no formalized consequence, once alerted, where possible, a member of the CSM Committee reaches out to the NO to investigate the cause of the potential breach and may ask for a refund out of goodwill for a proven breach/non-refuted breach allegation; in the future it is possible that the CSM Committee will establish Easy Track rails to have the opportunity to burn part of the NO's bond as a penalty enforcement mechanism similar to the one available for rewards stealing today
+It is the responsibility of each NO using LoE, at all active duty times, to have configured in the CC or out-of-protocol PBS sidecar of choice, for each validator run for the protocol, regardless of SM, but depending on whether a key is operated on [Mainnet](https://etherscan.io/address/0xf95f069f9ad107938f6ba802a3da87892298610e#readContract) or [Holešky](https://holesky.etherscan.io/address/0x2d86C5855581194a386941806E38cA119E50aEA3#readContract), the address(es) of at least one vetted relay labeled “must use some”, as well as any number of entries labeled "may use" of the MEV Boost Relay Allowed List - found on the [Node Operator Portal](https://enchanted-direction-844.notion.site/6d369eb33f664487800b0dedfe32171e?v=d255247c822c409f99c498aeb6a4e51d) or by querying the `get_relays` method of the respective smart contract.
 
-Open Questions/Action Items:
-* Define informative labels for every potential breach
-* Define point of reference in time of slot to assess bid availability & sizes
-* Formalize enforcement mechanisms and penalty structure for CM & SDVT as well as CSM
+Proposals of blocks that get flagged by monitoring because of their unknown payload source (PS), or - aside from locally built ones - exclusively of blocks whose payloads were sourced from relays labeled “may use”, although early in the relevant slots there were more valuable payloads available via relays labeled “must use some”, indicate the potential misconfiguration of an NO's validator(s).
 
-### D.2 - Min-Bid & Boost Factors
-Scope: All NOs of all Lido SR SMs <br>
-Responsibility: Until Ethereum's implementation and LoE's adoption of EIP-7805: Fork-choice enforced Inclusion Lists (FOCIL), each NO may configure the validator client parameters "min-bid" and/or "builder/local block value boost factor" according to the socially agreed upon values to allow for a certain amount of local block building, including some otherwise censored transactions from the public mempool <br>
+In cases of an NO of the CM or SDVTM, contributors to the Node Operator Mechanisms (NOM) workstream of the Lido DAO will reach out to the NO and ask for a clarification of the situation. If force majeure can be ruled out as the cause of the incident and no other plausible explanation can be provided, it must be assumed that an unvetted relay has been configured by the NO or that the “must use some” selection has been ignored. Consequently, depending on the severity of the offense, contributors may consider raising a formal issue with the NO on the Lido Research Forum, requesting remediative action, and seeking the reimbursement of missed rewards.
 
-References:
-* EIP-7805 FOCIL https://eips.ethereum.org/EIPS/eip-7805
-* Lido Node Operator MEV Boost min-bid guidance https://research.lido.fi/t/lido-node-operator-mev-boost-min-bid-guidance/3347
+In cases of an NO of the CSM, the approach is basically the same, with the two exceptions that reaching the NO is only possible if a contact was voluntarily shared with the community, and that instead of contributors to NOM such to the [Community Staking Module Committee](https://research.lido.fi/t/community-staking-module-committee/8333) will reach out to the NO.
 
-Potential breach, fees monitoring label & detection logic:
-* Exclusively used min-bid misconfigured
-  * Label: Unknown Payload Source (PS)
-  * Criteria 1: Value of proposed block is above allowed min-bid threshold
-  * Criteria 2: Payload of proposed block is not found at "proposer payload delivered" endpoint of vetted relays' APIs
-  * Criteria 3: Bid above allowed min-bid threshold was available from at least one vetted relays at t=? of slot
-* Exclusively used builder boost factor misconfigured
-  * Label: None yet
-  * Criteria 1: Payload of proposed block is not found at "proposer payload delivered" endpoint of vetted relays' APIs
-  * Criteria 2: Bid above allowed builder boost factor weighted payload value was available from at least one vetted relays at t=? of slot
-* Hybrid use of min-bid & builder boost factor misconfigured
-  * Label: None yet
-  * Criteria 1: Value of proposed block is above allowed min-bid threshold
-  * Criteria 2: Payload of proposed block is not found at "proposer payload delivered" endpoint of vetted relays' APIs
-  * Criteria 3: Bid above allowed min-bid threshold was available from at least one vetted relays at t=? of slot
-  * Criteria 4: Bid above allowed builder boost factor weighted payload value was available from at least one vetted relays at t=? of slot
+**_NOTE:_** For CSMv2, an automation of measures in response to offences is being contemplated.
 
-Consequences of non-conformance & way to enforce:
-* CM & SDVT - Currently no formalized consequence, once alerted, a NOM contributor reaches out to the NO to investigate the case and may ask for a refund out of goodwill for a proven breach/non-refuted allegation
-* CSM - Currently no formalized consequence, once alerted, where possible, a member of the CSM Committee reaches out to the NO to investigate the case and may ask for a refund out of goodwill for a proven breach/non-refuted allegation; in the future it is possible that the CSM Committee will establish Easy Track rails to have the opportunity to burn part of the NO's bond as a penalty enforcement mechanism similar to the one available for rewards stealing today
+### D.2 - Censorship Resistance Allowance
 
-Open Questions/Action Items:
-* Agree on approach regarding either only allowing min-bid, builder boost factor, or a hybrid as well as method to determine/suggest target value(s). At, e.g., min-bid 0.07 ETH & a boost factor for external builders of 0.9 we would effectively weaken censorship resistance because payloads 0.07 ETH >= x > 0.63 ETH would be sourced externally instead of locally, like under exclusive min-bid use. Consequently, to strengthen CR we would need to increase the min-bid allowed in hybrid use to x = 10/9 * 0.07 ETH which would make monitoring more difficult. The challenging monitoring would also be the case for exclusive builder boost factor use, alongside a higher absolute revenue loss potential.
-* Define informative labels for every potential breach
-* Define point of reference in time of slot to assess bid availability & sizes
-* Formalize enforcement mechanisms and penalty structure for CM & SDVT as well as CSM
-
-### D.3 - Minimum Block Proposal Performance
-Scope: All NOs of all Lido SR SMs <br>
-Responsibility: Each NO, regardless of setup, must ensure a minimum level of block proposal performance of X% based on the performance measured for Y over time Z <br>
-
-References:
-* Lido on Ethereum Block Proposer Rewards Policy v2.0 https://lido.mypinata.cloud/ipfs/QmaLLjLE2iecf59kTQSVC1rHVPjjQwGDTCouR8A871BNRY#D4II-Monitoring-amp-Penalties-Specification
-* Lido Node Operator MEV Boost min-bid guidance https://research.lido.fi/t/lido-node-operator-mev-boost-min-bid-guidance/3347
-* CSM v2 Strike System regarding performance: https://hackmd.io/@lido/csm-v2-internal#Bad-performance-strikes
-
-Potential breach, fees monitoring label & detection logic:
-* Insufficient block proposal performance
-  * Label: None yet
- 
-Open Questions/Action Items:
-* Agree on approach
-* Formalize enforcement mechanisms and penalty structure for CM & SDVT as well as CSM
+### D.3 - Minimum EL Performance
 
 ### D.4 - Fee Recipient
-Scope: All NOs of all Lido SR SMs <br>
-Responsibility: Each NO must configure the fee recipient of the validators run for LoE to the `LidoExecutionLayerRewardsVault` of the respective Ethereum network to fairly distribute the priority fees directly received, MEV extracted, and APM compensations earned with the system. <br>
-References:
-* https://docs.lido.fi/deployed-contracts/
-* https://etherscan.io/address/0x388C818CA8B9251b393131C08a736A67ccB19297
-* https://holesky.etherscan.io/address/0xE73a3602b99f1f913e72F8bdcBC235e206794Ac8
-* https://sepolia.etherscan.io/address/0x94B1B8e2680882f8652882e7F196169dE3d9a3B2
-* https://hackmd.io/cKUjOfoMSKyvxLu57KPdLg?view#Incorrect-MEV-configuration
-* https://lido.mypinata.cloud/ipfs/QmZTMfmJZsYHz61f2FjhYdh5VNu6ifjYQJzYUGkysHs8Uu#Lido-on-Ethereum-Standard-Node-Operator-Protocol---Validator-Exits
+To protect the economic competitiveness of LoE, rewards stealing must be prevented.
 
-Potential breach, fees monitoring label & detection logic:
-* Fee recipient misconfigured / rewards stealing
-  * Label: Unknown Fee Recipient (FR) / Block with unknown Fee Recipient
-  * Criteria 1: `fee_recipient` of proposed block $\neq$ `LidoExecutionLayerRewardsVault`
+It is the responsibility of each NO using LoE, at all active duty times, to have configured in the CC, VC and/or signing service of choice, for each validator run for the protocol, regardless of SM, but depending on whether a key is operated on [Mainnet](https://docs.lido.fi/deployed-contracts/), [Holešky](https://docs.lido.fi/deployed-contracts/holesky/) or [Sepolia](https://docs.lido.fi/deployed-contracts/sepolia/), the `LidoExecutionLayerRewardsVault` as the `fee_recipient` for the block rewards, comprising of the priority fees received from user for transaction inclusion, the MEV extracted through PBS and the compensations for optional APM services provided.
 
-Consequences of non-conformance & way to enforce:
-* CM & SDVT - Currently no formalized consequence, once alerted, a NOM contributor reaches out to the NO to investigate the case and ask for a refund of the rewards stolen.
-* CSM - When a proposal with an incorrect fee recipient is detected, an amount of the affected NO's bond equal to the block reward and an additional disincentive of 0.1 ETH is locked for 8 weeks, and the NO is afforded a challenge period to discuss the situation in the CSM Support section of the Lido Research Forum. Once the NO compensates LoE for the incident or upon expiry of the challenge period, if an agreement has been reached with the community that force majeure was the cause of the event, the lock on the bond is lifted. If otherwise neither an agreement can be reached nor the compensation is being paid, the CSM Committee will initiate an Easy Track motion to propose to the Lido DAO that the locked portion of the NO's bond be burned as a penalty. Any of the NO's validators that fail to provide a full bond - i.e. become unbonded - as a result of this measure are requested to exit the protocol by the Validators Exit Bus Oracle (VEBO). If the requested validators are not exited, they are marked stuck, and no operator rewards are distributed to the NO until the stuck keys are exited. After the implementation of [EIP-7002: Execution Layer Triggerable Withdrawals](https://eips.ethereum.org/EIPS/eip-7002) into LoE, stuck validators will instead be forcefully ejected at the protocol level.
+Proposals of blocks that get flagged by monitoring because of their unknown fee recipient (FR), indicate the potential misconfiguration of an NO's validator(s).
 
-Open Questions/Action Items:
-* Formalize enforcement mechanisms and penalty structure for CM & SDVT
+In cases of an NO of the CM or SDVTM, contributors to NOM will reach out to the NO and ask for a clarification of the situation. If force majeure can be ruled out as the cause of the incident and no other plausible explanation can be provided, it must be assumed that the FR has been incorrectly configured by the NO and the proposed block's rewards have been stolen. Consequently, depending on the severity of the offense, contributors may consider raising a formal issue with the NO on the Lido Research Forum, requesting remediative action, and seeking the reimbursement of the stolen rewards.
+
+In cases of an NO of the CSM, upon detection of a proposal with an unknown FR, an amount of the affected NO's bond equal to the block rewards and an additional disincentive of 0.1 ETH is locked for 8 weeks, and the NO is afforded a challenge period to discuss the situation in the [CSM Support category](https://research.lido.fi/c/csm-support/21) of the Lido Research Forum. Once the NO compensates LoE for the incident or upon expiry of the challenge period, if an agreement has been reached with the community that force majeure was the cause of the event, the lock on the bond is lifted. If otherwise neither an agreement can be reached, nor a compensation is being paid, the CSM Committee will initiate an [Easy Track motion](https://lido.fi/governance#easy-track) to propose to the Lido DAO that the locked portion of the NO's bond be burned as a penalty. Any of the NO's validators that fail to provide a full bond - i.e. become unbonded - as a result of this measure are [requested to exit the protocol](https://lido.mypinata.cloud/ipfs/QmZTMfmJZsYHz61f2FjhYdh5VNu6ifjYQJzYUGkysHs8Uu). If the requested validators are not exited, they are marked stuck, and no operator rewards are distributed to the NO until the stuck keys are exited.
+
+**_NOTE:_** After the implementation of [EIP-7002: Execution Layer Triggerable Withdrawals](https://eips.ethereum.org/EIPS/eip-7002) into LoE, stuck validators will instead be forcefully ejected at the protocol level.
 
 # Appendix
 ## Appendix A - Ethereum Standards, Infrastructure & Auxiliary Proposer Mechanisms
@@ -171,7 +95,7 @@ Sometimes a validator fails to propose a block for an assigned slot -- the slot 
 ### A.3 - Local Block Building
 In local block building, the validator assigned for the proposal duty of a slot selects and orders to its preference the transactions to be included in the block from the local mempool of its execution client (EC). Those transactions may originate from the validator itself, from users who have sent them to the validator for inclusion, or from Ethereum's public mempool. The EC has access to the latter by participating in the EL gossip network, which allows the EC to collect transactions for its local mempool that are broadcast by other validators that have verified the validity of those transactions by successfully executing them on their local nodes.
 
-In the assigned slot and initiated by a request of its CC, the validator selects the transactions to be included, taking into account the gas limit of the block. The EC then locally executes the selected transactions in the specified order to obtain an updated state tree, the root of which it sends to the CC along a list of the included transactions -- the execution payload. Following this, the CC takes the state root and execution payload received, and together with a range of additional data, wraps them into a block. In further steps, the block is forwarded to the VC for signing and back to the CC for broadcasting to the network via the gossip protocol of the CL, so that finally the other validators can check the block's validity and vote on its appending.
+In the assigned slot and initiated by a request of its CC, the validator selects the transactions to be included, taking into account the gas limit of the block. The EC then locally executes the selected transactions in the specified order to obtain an updated state tree, the root of which it sends to the CC along a list of the included transactions -- the execution payload. Following this, the CC takes the state root and execution payload received, and together with a range of additional data, wraps them into a block. In further steps, the block is forwarded to the signing service or VC handling the validator's private key for signing, and back to the CC for broadcasting to the network via the gossip protocol of the CL, so that finally the other validators can check the block's validity and vote on its appending.
 
 A block locally built on the node(s) of a validator is often referred to as vanilla.
 

@@ -65,7 +65,14 @@ In cases of an NO of the CSM, upon detection of a proposal with an unknown FR, a
 
 **_NOTE:_** After the implementation of [EIP-7002: Execution Layer Triggerable Withdrawals](https://eips.ethereum.org/EIPS/eip-7002) into Lido, stuck validators will instead be forcefully ejected at the protocol level.
 
-### D.2 - MEV Boost Relay Allowed List
+### D.2 - Auxiliary Proposer Mechanisms List
+NOs utilizing Lido are permitted to run APMs that have been validated by the community and are included in the officially recognized APM List. This list comprises APMs that have been assessed as sufficiently de-risked and demonstrably beneficial to both Lido and the broader Ethereum ecosystem. 
+
+NOs are responsible for adhering to all configuration requirements, security best practices, and guidelines related to external rewards that may be derived from delegated capital. 
+
+Any APM seeking inclusion in the list must follow the standard evaluation and approval procedure. Failure to comply with the established guidelines — whether identified through internal monitoring or substantiated external reports — may result in a compliance flag being raised by NOM contributors. In cases of severe breaches, a formal issue may be escalated to the Lido DAO, potentially requiring remedial action or reimbursement in instances of misappropriated rewards.
+
+### D.3 - MEV Boost Relay Allowed List
 To foster Ethereum's decentralization and empower NOs who would otherwise not be able to economically viable compete with actors who pursue sophisticated strategies for maximal extraction of MEV, Lido supports out-of-protocol PBS according to the MEV-Boost specification (see [Appendix A.4.1 ff](#a41---proposer-builder-separation)). To ensure their reliability and values-alignment with Ethereum, each relay applying to serve Lido undergoes a vetting process by the [Relay Maintenance Committee (RMC)](https://research.lido.fi/t/lido-on-ethereum-identify-and-constitute-relay-maintenance-committee/3386).
 
 It is the responsibility of each NO using Lido, at all active duty times, to have configured in the CC or out-of-protocol PBS sidecar of choice, for each validator run for the protocol, regardless of SM, but depending on whether a key is operated on [Mainnet](https://etherscan.io/address/0xf95f069f9ad107938f6ba802a3da87892298610e#readContract) or [Holešky](https://holesky.etherscan.io/address/0x2d86C5855581194a386941806E38cA119E50aEA3#readContract), the address(es) of at least one vetted relay labeled “must use some”, as well as any number of entries labeled "may use" of the MEV Boost Relay Allowed List - found on the [Node Operator Portal](https://enchanted-direction-844.notion.site/6d369eb33f664487800b0dedfe32171e?v=d255247c822c409f99c498aeb6a4e51d) or by querying the `get_relays` method of the respective smart contract.
@@ -122,9 +129,6 @@ MEV-Boost has also addressed concerns about the weakness of PBS in terms of prot
 ##### A.4.1.4 - Sidecars
 
 ### A.5 - APM Infrastructure
-
 #### A.5.1 - Out-Of-Protocol PBS Builders & Relays
-
 ##### A.5.1.1 - Troubleshooting
-
 ##### A.5.1.2 - Responsibilities & Incident Management

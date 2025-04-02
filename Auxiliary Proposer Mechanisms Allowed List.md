@@ -15,7 +15,7 @@ Entry|Type|Parameter|Value
 ||Setting|`relay`|MEV Boost Relay Allowed List
 ||Setting|`relays`|MEV Boost Relay Allowed List
 ||Setting|`min-bid`|`0.07`
-[Commit-Boost PBS module]([https://commit-boost.github.io](https://github.com/Commit-Boost/commit-boost-client))|MEV-Boost Implementation||
+[Commit-Boost PBS module](https://github.com/Commit-Boost/commit-boost-client)|MEV-Boost Implementation||
 ||Setting|`relays`|MEV Boost Relay Allowed List
 ||Setting|`min_bid_eth`|`0.07`
 [Grandine](https://grandine.io/)|Consensus Client||
